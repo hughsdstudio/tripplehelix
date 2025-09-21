@@ -284,10 +284,12 @@
             <div class="legend">
                 <h3>Controls</h3>
                 <button class="reset-button" onclick="resetAllNodes()">Reset Layout</button>
+                <button class="reset-button" onclick="exportText()" style="margin-left: 8px;">Export Text</button>
                 <div class="instructions">
                     • Drag nodes to position them<br>
                     • Double-click to unlock nodes<br>
-                    • Nodes lock when moved
+                    • Nodes lock when moved<br>
+                    • Export creates .txt file with all content
                 </div>
                 
                 <h3>Legend</h3>
@@ -676,6 +678,71 @@
             // Visual feedback
             node.selectAll("rect").style("stroke", "#ff6b6b")
                 .transition().duration(1000).style("stroke", null);
+        };
+
+        // Global function to export text content
+        window.exportText = function() {
+            // Define quadrant order (clockwise from top-right)
+            const quadrantOrder = ['epistemic', 'anticapture', 'recursive', 'temporal'];
+            const quadrantNames = {
+                'epistemic': 'EPISTEMIC MUTATIONS',
+                'anticapture': 'ANTI-CAPTURE STRATEGIES', 
+                'recursive': 'RECURSIVITY PROBLEM',
+                'temporal': 'TEMPORAL REGIMES'
+            };
+
+            let textContent = "RECURSIVE TEMPORALITIES: EPISTEMIC MUTATIONS & ANTI-CAPTURE STRATEGIES\n";
+            textContent += "=" + "=".repeat(70) + "\n\n";
+            textContent += "Framework: This document maps the recursive dynamics between temporal regimes, epistemic mutations, and strategies of capture/commons across technological paradigms. Each section represents a distinct but interconnected domain of analysis.\n\n";
+
+            // Process each quadrant in clockwise order
+            quadrantOrder.forEach(quadrant => {
+                const quadrantNodes = data.nodes.filter(d => d.quadrant === quadrant && d.type !== 'quadrant');
+                
+                if (quadrantNodes.length > 0) {
+                    textContent += quadrantNames[quadrant] + "\n";
+                    textContent += "-".repeat(quadrantNames[quadrant].length) + "\n\n";
+                    
+                    quadrantNodes.forEach((node, index) => {
+                        // Clean up the text - remove HTML breaks and extra whitespace
+                        const cleanText = node.label
+                            .replace(/\n/g, ' ')
+                            .replace(/\s+/g, ' ')
+                            .trim();
+                        
+                        textContent += `${index + 1}. ${cleanText}\n\n`;
+                    });
+                    
+                    textContent += "\n";
+                }
+            });
+
+            // Add footer with current date
+            const currentDate = new Date().toLocaleDateString();
+            textContent += "\n" + "-".repeat(70) + "\n";
+            textContent += `Exported from Recursive Temporalities Diagram on ${currentDate}\n`;
+            textContent += "Interactive diagram available at: [URL where hosted]\n";
+
+            // Create and download file
+            const blob = new Blob([textContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'recursive_temporalities_text_export.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Visual feedback
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = 'Exported!';
+            button.style.background = '#14aa8c';
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '#0064b4';
+            }, 2000);
         };
 
         // Add hover effects and double-click to unlock
