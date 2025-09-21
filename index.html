@@ -238,37 +238,28 @@
     <div class="container">
         <div class="sidebar">
             <div class="section">
-                <h3>Framework</h3>
-                <p>This diagram maps the recursive dynamics between temporal regimes, epistemic mutations, and strategies of capture/commons across technological paradigms. Each quadrant represents a distinct but interconnected domain of analysis.</p>
+                <h3>Dynamic Corpus</h3>
+                <p>This diagram randomly samples from a corpus of theoretical texts about steam engines, recursivity, epistemic frameworks, and technological paradigms. Each refresh generates a new arrangement of concepts.</p>
             </div>
             
             <div class="section">
-                <h3>Temporal Regimes</h3>
-                <p>How steam, cybernetic, and computational eras create distinct temporalities. "The steam engine forced a revolution in the very concept of work and energy." From thermodynamic cycles to predictive futures.</p>
+                <h3>Source Texts</h3>
+                <p>Drawing from a collection of essays exploring the recursive relationships between technological paradigms, historical consciousness, and epistemic transformation. These texts share a focus on how machines become models for understanding society, mind, and nature—from steam engines to cybernetics to computational systems.</p>
             </div>
             
             <div class="section">
-                <h3>Epistemic Mutations</h3>
-                <p>Technologies as epistemic infrastructures. "Because he didn't have a formula for it, because he came before the steam engine." Each paradigm reshapes what counts as knowledge.</p>
-            </div>
-            
-            <div class="section">
-                <h3>Recursivity Problem</h3>
-                <p>"Where does recursion begin? The cause is the totality of the loop." How circular causation replaces linear explanation in understanding sociotechnical systems.</p>
-            </div>
-            
-            <div class="section">
-                <h3>Anti-Capture Strategies</h3>
-                <p>Commons vs enclosure dynamics. "When residues are enclosed by platforms, the cultural cycle suffers metabolic rift." Strategies for keeping knowledge circulating.</p>
+                <h3>Methodology</h3>
+                <p>Each node contains a semantic chunk randomly selected from the corpus. Positioning reflects thematic clustering but can be rearranged. The diagram maps recursive dynamics between temporal regimes, epistemic mutations, and anti-capture strategies.</p>
             </div>
             
             <div class="legend">
                 <h3>Controls</h3>
+                <button class="reset-button" onclick="generateNewSelection()">New Random Selection</button>
                 <button class="reset-button" onclick="resetAllNodes()">Reset Layout</button>
                 <button class="reset-button" onclick="exportText()">Export Text</button>
                 <div class="instructions">
                     • <strong>Drag nodes to position them</strong><br>
-                    • Nodes stay where you place them<br>
+                    • "New Random Selection" generates fresh content<br>
                     • Export creates .txt file with arrangement
                 </div>
                 
@@ -297,147 +288,668 @@
                     <div class="legend-line" style="border: 2px solid black;"></div>
                     <span>engine (solid thick)</span>
                 </div>
-                <div class="legend-item">
-                    <div class="legend-line" style="background: black; background-image: repeating-linear-gradient(90deg, black, black 10px, transparent 10px, transparent 15px);"></div>
-                    <span>quadrant labels (medium dash)</span>
-                </div>
             </div>
         </div>
         
         <div class="diagram-container">
             <svg id="network" width="1400" height="1000"></svg>
             <div style="margin-top: 12px; font-size: 0.8rem; color: #525257; font-style: italic; max-width: 1400px;">
-                <p>Each node contains substantial text from the source documents. The diagram reveals how temporal regimes, epistemic frameworks, recursive processes, and capture/commons dynamics form an interconnected system of historical analysis. <strong>Drag nodes to explore relationships and create custom arrangements.</strong></p>
+                <p>Each node contains text fragments randomly sampled from the source corpus. The diagram reveals emergent relationships between concepts as you rearrange them. <strong>Drag nodes to explore relationships and create custom arrangements.</strong> Generate new selections to discover different conceptual configurations.</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Data structure with expanded content nodes
-        const nodes = [
-            // Central engine
-            { id: "engine", label: "RECURSIVE\nHISTORY", type: "engine", quadrant: "center", x: 700, y: 500 },
-            
-            // TEMPORAL REGIMES (Top-Left Quadrant)
-            { id: "steam_era", label: "Steam era: 'Because he didn't have a formula for it, because he came before the steam engine. The era of the steam engine and administrative balance-sheets were needed for us to ask: what does a machine yield?'", type: "temporal", quadrant: "temporal", x: 250, y: 150 },
-            
-            { id: "thermodynamic_time", label: "Thermodynamic cycles: 'Maximum efficiency demands reversibility that no real engine attains. History flirts with reversibility in myths of restoration, yet every cycle completes with hysteresis.'", type: "temporal", quadrant: "temporal", x: 400, y: 200 },
-            
-            { id: "cybernetic_era", label: "Cybernetic shift: 'With information theory, we discovered that entropy is not thermodynamical, but statistical. The machine is the relational process at play.'", type: "temporal", quadrant: "temporal", x: 300, y: 300 },
-            
-            { id: "computational_crisis", label: "Computational temporality: 'The future arrives before the present. Predictive systems and financial instruments craft today out of tomorrow, preempting what has not yet occurred.'", type: "temporal", quadrant: "temporal", x: 150, y: 250 },
-            
-            { id: "presentism", label: "Regime of presentism: 'The horizon of expectation contracts into a permanent now, history and future alike subordinated to an eternal present tense.'", type: "temporal", quadrant: "temporal", x: 200, y: 400 },
-            
-            { id: "occupation_time", label: "Work as occupation: 'Activity without ends, continuous absorption that suspends the distinction between labor and leisure, between production and display.'", type: "temporal", quadrant: "temporal", x: 350, y: 350 },
-            
-            // EPISTEMIC MUTATIONS (Top-Right Quadrant)
-            { id: "steam_episteme", label: "Steam's conceptual revolution: 'The steam engine forced a revolution in the very concept of work and energy, expanding definition from simple mechanics to universal principle of thermodynamics.'", type: "epistemic", quadrant: "epistemic", x: 1000, y: 150 },
-            
-            { id: "freud_machine", label: "Psyche as steam engine: 'Freud's whole discussion revolves around that question: what, in terms of energy, is the psyche? The mind became a pressure system—drives, repression, release.'", type: "epistemic", quadrant: "epistemic", x: 1150, y: 250 },
-            
-            { id: "lacan_language", label: "Language as machine: 'The unconscious concerns the living dynamic of language itself, and language can be thought of as a literal machine. What we call unconscious is language.'", type: "epistemic", quadrant: "epistemic", x: 900, y: 300 },
-            
-            { id: "infrastructure_pedagogy", label: "Technologies teach: 'Technologies teach us how to imagine ourselves. The boiler gives us the energetic unconscious; statistical engines sponsor a subject of prediction and prompt.'", type: "epistemic", quadrant: "epistemic", x: 1200, y: 350 },
-            
-            { id: "razi_distinction", label: "Al-Razi's epistemology: 'We can know that a techne like the steam engine transforms society (general knowledge), but cannot fully know what it is in its totality without ethical deliberation.'", type: "epistemic", quadrant: "epistemic", x: 950, y: 200 },
-            
-            { id: "suhrawardi_illumination", label: "Suhrawardi's paths: 'There are two paths: reasoning and reading of signs, and a direct way whereby truth illuminates us through mystical experience, where subject, object, and knowledge coincide.'", type: "epistemic", quadrant: "epistemic", x: 1100, y: 400 },
-            
-            // RECURSIVITY PROBLEM (Bottom-Left Quadrant)
-            { id: "recursion_beginning", label: "Circular causation: 'Where does recursion begin? The search for the beginning is a search for first cause. In a circular loop, the beginning is only temporal. The cause is the totality of the loop.'", type: "recursive", quadrant: "recursive", x: 200, y: 650 },
-            
-            { id: "spiral_process", label: "Recursivity as spiral: 'Recursivity ought to be understood not as mere repetition, but as a process of reflexivity in which contingency might emerge and create singularities.'", type: "recursive", quadrant: "recursive", x: 350, y: 750 },
-            
-            { id: "triple_helix_mutation", label: "Systemic reconfiguration: 'A generative mutation in one strand inevitably forces a reconfiguration of the others. The steam engine forced society and nature to be reconceived through thermodynamic lens.'", type: "recursive", quadrant: "recursive", x: 400, y: 600 },
-            
-            { id: "actual_before_conceptual", label: "Technology precedes theory: 'The engine was actual before becoming conceptual. Technics made what science later came to better understand. The world became thermodynamical before knowing so.'", type: "recursive", quadrant: "recursive", x: 250, y: 800 },
-            
-            { id: "helical_cycles", label: "Historical hysteresis: 'Cycles remain, but they are helical cycles—recurrences displaced along an axis of irretrievable transformation. The path back is not the path out.'", type: "recursive", quadrant: "recursive", x: 150, y: 700 },
-            
-            { id: "entropy_constitution", label: "Waste as constitutive: 'No conversion is free. Entropy is not afterthought: waste heat is constitutive. Each historical advance generates its externalities—the helix advances by spending itself.'", type: "recursive", quadrant: "recursive", x: 300, y: 550 },
-            
-            // ANTI-CAPTURE STRATEGIES (Bottom-Right Quadrant)
-            { id: "metabolic_rift", label: "Metabolic rift: 'When residues are enclosed by platforms, IP regimes, or markets, the cultural cycle suffers metabolic rift: outputs no longer fertilize collective reasoning.'", type: "anticapture", quadrant: "anticapture", x: 1000, y: 650 },
-            
-            { id: "return_vector", label: "Return vs capture: 'The metabolic force of artistic residue depends on its return vector to the general intellect. Anti-capture design keeps residues circulating as public nutrients.'", type: "anticapture", quadrant: "anticapture", x: 1200, y: 750 },
-            
-            { id: "nomadic_sedentary", label: "Nomadic vs sedentary: 'Nomadic epistemology is characterized by fluidity, alterity, customary knowledge. Sedentary paradigm is founded on archives, fixed identities, state control, universal reason.'", type: "anticapture", quadrant: "anticapture", x: 900, y: 600 },
-            
-            { id: "open_processes", label: "Protocol transparency: 'Open processes, composable toolchains, provenance credentials that block commodification while preserving pedagogy become integral to inhuman labor itself.'", type: "anticapture", quadrant: "anticapture", x: 1100, y: 800 },
-            
-            { id: "recollective_rationality", label: "Recollective media: 'What if technological assemblage were engineered not merely to store memory, but to structure it as tool for reason? History as propositions to be rationally reconstructed.'", type: "anticapture", quadrant: "anticapture", x: 950, y: 750 },
-            
-            { id: "leaks_matter", label: "Productive leaks: 'Engines leak: heat, steam, noise, time. Some of most consequential innovations are re-routings of the leak—capturing waste heat, revaluing idleness as study.'", type: "anticapture", quadrant: "anticapture", x: 1150, y: 550 }
+        // Complete text corpus from the provided documents
+        const textCorpus = [
+            // Alina Triple Helix
+            "Much of the literature on models frames them as representational objects, taken to be in some kind of formal relationship with their intended target systems.",
+            "On these views, models are artifacts with certain purposes - centrally, as with history, to render the world intelligible.",
+            "The triple helix is a figurative apparatus, hoping to grow our understanding on the basis of analogy.",
+            "Seen from one perspective - peering-through the helix - one observes cycles. Seen from far away - peering-for the helix - one gets the impression of a line propagating in a given direction.",
+            "This is a second moment of synthesis in the model, between the cyclical and linear pictures of world history.",
+            "In beholding it, a first reference comes to mind, that of DNA. Helices and other extended chiral structures show up often in biology.",
+            "If this is a geometry of heredity, so too could it be a geometry of history, for in a sense history is but the heredity of society.",
+            "DNA itself is a record - it acts only through proxies, via transcription and translation.",
+            "It is thus that historically-informed action may be conceived - first, by selecting the right sections of history from which to learn.",
+            "RNA is volatile and short-lived. DNA needs to last until cell replication, with supplementary help of repair mechanisms.",
+            "A triple structure might be construed as even more robust - This makes sense for histories, which should stand the test of time potentially over multiple lifetimes.",
+            "One such means is mutation (drift), which manifests through errors in replication or repair, and thus can be conceived as processes that have to deal with repetition and trauma.",
+            "This resonates with a view of history as a society's record of its traumas and its ongoing attempts to deal with them.",
+            "Even if the code itself is retained, the actual winding, the geometry, is flexible and exposes or obscures things.",
+            "So can we see in history how at different times certain events seem more or less imposing - though memory is preserved, it is nevertheless selective in its amplitude.",
+            "Perhaps, as suggested by White, these are the classics that configure the mythos - our apparatus for interpreting history.",
+            "The process to go from information to action is that of translation and transcription.",
+            "In bacteria, whose genomes consist of RNA, smaller complimentary sequences are produced for the purpose of synthesis, thus exhibiting a sort of 'redundant translation'.",
+            "The passage to DNA brings about a need for nonredundant translation, as well as a decoupling of translation and transcription.",
+            "This type of model would not be of much interest to historiography, for the strands we wish to study are, though correlated, not meant to be redundant.",
+            "It might be more fruitful instead to think of a system of multiple complementarity.",
+            "This also means that there are multiple versions of the same triple helix, depending on the local presence of left-wards or right-wards binding.",
+            "This enables a form of pluralism of historical information storage.",
+            "Perhaps, further analogy can be extracted here - swerves in political tendencies towards the left or the right can be analyzed as the implementation of the connections of the society strand.",
+            "In analyzing emerging technologies in this frame, we may ask, for instance, how genome sequencing reveals and confounds notions of kinship.",
+            "So may a technological analysis of history disturb notions of community and culture by transforming narratives into mere data.",
+            "AI can also produce significant advances in forecasting. As we see with AlphaFold, which can predict with great accuracy the final geometry of complex protein structures.",
+            "Models that anticipate the coiling of the triple helix amplify its capacity to anticipate itself - this might lead to new emerging dynamics as expectation further feeds back into action.",
+            "A virus is an alien entity that inserts itself into the locus of genetic information storage and hijacks the molecular machinery towards its own ends.",
+            "This might resonate with the recent analysis put forward in the book of Exocapitalism - can we see capitalism as a historical virus?",
+            "Furthermore, fragments of ancient viral DNA still reside in our genome - have there been other such entities that have hijacked history in the past?",
+            "There is also another alien entity that stores a separate genome inside eukaryotic cells - the Mitochondria.",
+            "With a smaller size and inherited always through the maternal line, perhaps this gives us a way of thinking of parallel histories, suppressed by the dominant ones.",
+            "Such might be the histories of oppressed groups, whose contributions have largely been erased from history.",
+            "Light, for instance, coils around in a helical pattern when circularly polarized.",
+            "Unfortunately, due to the particular coupling of the electric and magnetic fields, both coil in the same direction, and one simply is a staggered or delayed image of the other.",
+            "This quantum case might be of interest because the notion of conjugate variables naturally emerges.",
+            "It also allows for non-locality, which might be of increasing interest in our highly-mediated world, where it is not uncommon for network effects to produce couplings between things happening in opposite sides of the world.",
+            "While DNA stores genetic information, waves (of any kind) store information too in the form of energy.",
+            "The most striking example is how the light of distant stars gives us a glimpse into the past, all the way down to the cosmic microwave background.",
+            "Funnily enough, circularly polarized light is not very common as a natural occurrence. You will most often see it in association with biology.",
+            "There is another example of circularly polarized light that bewilders the gaze - the northern lights, aurora borealis.",
+            "Perhaps, these can be seen as part of the aesthetic component of history, of how it not only orients us but can also disorient us, create an impression of awe and wonder.",
+            "If DNA gave us a grammar for hereditary constraint and light sketched a topology of coupling and interference, the steam engine offers a pedagogy of conversion.",
+            "It is the machine that makes explicit what the helix must always already do: take a difference—a gradient, a surplus, a pressure—and fold it through a sequence of mediations until it appears as work.",
+            "Heat becomes motion only by passing through a disciplined choreography of valves, pistons, governors, and flywheels.",
+            "Likewise, historical energies—geological stores, symbolic intensities, collective affects—do not 'act' until institutions, techniques, and norms canalize them into reproducible sequences.",
+            "The steam engine is thus an allegory of the triple helix understood as thermodynamic governance.",
+            "Begin with the gradient. Nature supplies the asymmetry (coal seams; forests; river routes; atmospheric differentials; human bodies with caloric limits).",
+            "Technology scripts a cycle for exploiting it (boiler, cylinder, condenser). Society decides what counts as 'useful work'.",
+            "Already the helix is visible: N shapes the outer bounds of feasible conversions, T encodes the steps by which conversion occurs, S selects ends and distributes costs.",
+            "The crucial lesson is not that heat becomes motion, but that no conversion is free.",
+            "Entropy is not an afterthought: waste heat is constitutive. Each historical advance generates its externalities.",
+            "The helix advances by spending itself.",
+            "The steam governor concentrates the cybernetic moment. A simple feedback device, it throttles fuel when rotation exceeds a setpoint, preventing runaway and collapse.",
+            "Here the analogy is almost embarrassingly apt: norms, laws, and mores perform the governor's function—stabilizing oscillations, damping euphorias, preventing the system from shredding itself on its own accelerants.",
+            "But the governor also introduces lag and overshoot. It never coincides with the process it regulates; it reacts.",
+            "That delay—neither pure control nor pure spontaneity—maps onto the temporal structure of reform movements, regulatory regimes, and countercultures.",
+            "They arrive late, they correct, they sometimes overcorrect, and in correcting they become part of the engine, not its outside.",
+            "What we call 'society' is not the passenger; it is the feedback loop that keeps the engine from detonating and, in so doing, sets the cadence of historical time.",
+            "Thermodynamic cycles refine the picture. In the idealized Carnot sequence—intake, expansion, exhaust, compression—one confronts a paradox.",
+            "Maximum efficiency demands reversibility that no real engine attains. History, too, flirts with reversibility in its myths of restoration and return.",
+            "Yet every cycle completes with hysteresis: the path back is not the path out.",
+            "Once rail time synchronizes clocks, local noon never quite returns; once the factory rhythm entrains bodies, 'free time' is redefined by recuperation.",
+            "Once attention is formatted by feed and scroll, recollection itself is reauthored.",
+            "Cycles remain, but they are helical cycles—recurrences displaced along an axis of irretrievable transformation.",
+            "The steam analogy disciplines our earlier fascination with circularly polarized light: the spin is not pure; it drags a wake.",
+            "The metaphor also clarifies the double life of 'efficiency.' In engines, efficiency is a ratio of work to heat; in polities, it becomes a virtue-word that justifies reorganizations of life.",
+            "But the conversion prescription hides a choice-point: what shall count as work?",
+            "Moving looms or moving care? Extracting ore or extracting attention? The same gradient can be coupled to different loads.",
+            "Here the model earns its practical teeth. If historical understanding is translation-and-transcription, then political action is retiming the cycle and rewiring the load.",
+            "Alter intake (what energies are legitimate), reshape expansion (who benefits from the pressure), redefine exhaust (what is counted as waste and where it goes), and redesign compression.",
+            "The engine reminds us that 'progress' is less an acceleration than a retuning.",
+            "There is, inevitably, a psychology smuggled in by steam. The nineteenth century famously reimagined the mind as a pressure system—drives, repression, release.",
+            "Then retooled it again as code, signal, and noise. One may treat this migration of metaphors not as error but as infrastructural pedagogy.",
+            "Technologies teach us how to imagine ourselves. The boiler gives us the energetic unconscious; the switchboard and servomechanism bequeath regulation and signifier.",
+            "Our current statistical engines sponsor a subject of prediction and prompt.",
+            "The helix tracks this drift: T does not merely transform N into S; it transforms S into a medium for new T.",
+            "The engine that moves the world also moves the inner theater, and the governor installed in the factory is soon installed within the self.",
+            "What, then, are the limits of the analogy? First, beware determinism by caloric fiat. Not every historical gradient is thermal, and not every coupling is mechanical.",
+            "Second, resist the moralization of efficiency: the ratio is empty until a load is named, and loads are acts of valuation.",
+            "Third, remember that leaks matter. Engines leak: heat, steam, noise, time. Histories leak too: archives misfile, oralities persist, margins invent.",
+            "Some of the most consequential innovations are not improvements in the cylinder but re-routings of the leak.",
+            "Capturing waste heat as district energy; revaluing 'idleness' as study; converting the exhaust of one strand into the intake of another.",
+            "A society learns not only to burn cleaner, but to listen to its hiss.",
+            "Finally, the steam engine lets us say something precise about crisis. Boiler explosions are not mere metaphors for revolt; they are cautions about opacity under pressure.",
+            "Scales, residues, and silent microfractures accumulate until a threshold is crossed. The governor cannot see inside the boiler.",
+            "Translation: institutions calibrated to outputs often ignore the interior stresses they produce.",
+            "A helix committed to self-preservation must cultivate diagnostic translucency—practices that look into the vessel.",
+            "Statistics that count the uncounted, sensors for slow violence, narrations that give names to unnamed costs.",
+            "Without such translucency, our feedback becomes flattery, and our cycle ends not in work but in shrapnel.",
+            "If the triple helix is to be more than picture-pretty, the steam engine instructs us to think in conversions, cycles, and leaks.",
+            "In governors that are late but necessary; in efficiencies that must be argued for, not assumed; in hysteresis that forbids return without remainder.",
+            "It tells us that every gain carries its exhaust, that the point is not to abolish the cycle but to recompose it.",
+            "And that understanding without retuning is just heat with nowhere to go.",
+
+            // Analysis of three pieces
+            "Each text deals with how technological paradigms shape human subjectivity, historical understanding, and collective experience.",
+            "All three authors argue that technology does not merely aid thought—it configures it.",
+            "Bloomer shows how the steam engine became a cultural and epistemic infrastructure: remapping land, race, labor, and time.",
+            "Netto traces how Freud's energetic model of the psyche was conceptually made possible by the steam engine.",
+            "How Lacan later reframes the unconscious through cybernetics and information theory.",
+            "Green extends this logic into the digital present: computation becomes the dominant epistemic paradigm.",
+            "Displacing narrative coherence with predictive correlation.",
+            "From steam to software, machines don't just change what we do—they change how we think about ourselves, memory, and rationality.",
+            "Each piece interrogates how media technologies structure collective memory, not just preserve it.",
+            "Bloomer frames railways as moving monuments—archives of collective labor, loss, and belonging.",
+            "Inscribed with civil rights struggles and erased geographies.",
+            "Netto shows how Lacan views the unconscious as an archive of signifiers, structured like a language-machine.",
+            "Green critiques today's media landscape as an infinite, unstructured archive—a deluge that collapses history into algorithmic noise and presentism.",
+            "Memory is not just stored—it is formatted by the medium. And the medium, in turn, becomes a political actor in shaping historical consciousness.",
+            "Each text implicitly or explicitly utilizes a Triple Helix model—the dynamic co-evolution of nature, technology, and society.",
+            "Bloomer cites the Triple Helix (Etzkowitz & Leydesdorff) directly, showing how steam altered landscapes (nature), civic rhythms (society), and engineering knowledge (technology).",
+            "Netto tracks the cyclical influence of mechanical metaphors (e.g., steam, cybernetics, software) on psychoanalytic theories.",
+            "And how those theories reflect back into society.",
+            "Green frames both the steam engine and computation as 'mutations' in one strand of the triple helix that reconfigure the other two.",
+            "Thought, matter, and society do not evolve independently. They co-mutate through technological paradigms.",
+            "Machines are not neutral. Each text reveals how machines condition the emergence of the modern subject.",
+            "Freud's psyche is shaped by the homeostat and steam engine, later remodeled by Lacan's linguistic machine.",
+            "Green shows how AI models like transformers hollow out subjective reasoning, replacing it with statistical continuations—'history without a model.'",
+            "Bloomer reflects on how industrial labor roles (e.g., Pullman Porters) create civic identity and dignity, reconfiguring race and class subjectivities.",
+            "Our sense of self is always shaped by the dominant metaphor of the machine—whether it's the steam engine, the unconscious, or the neural net.",
+            "Each text shows how machines evolve from metaphors to material infrastructures that define the conditions of belonging.",
+            "Bloomer: Trains are both vehicles and symbols, shaping urbanization, labor, race, and movement.",
+            "Netto: The mind is not 'like' a machine; in Lacan's work, it becomes a machine—a symbolic one governed by signifiers.",
+            "Green: Computation isn't 'like' cognition—it has replaced our models of cognition, often without conceptual scaffolding.",
+            "These machines not only perform functions—they structure worlds: spatial, mental, political, and historical.",
+            "All three pieces locate moments where technological mutation leads to epistemic crisis.",
+            "Green: The crisis of historicity under computational media (infinite archive, no schema).",
+            "Netto: The breakdown of Freud's energetic model, and its replacement by symbolic and computational modes.",
+            "Bloomer: The steam engine's disorienting social transformation—displacement, erasure, but also belonging.",
+            "Mutation in one domain (technology) requires rethinking in others (self, society, nature). These texts all perform that work.",
+
+            // João Moraes on Recursivity
+            "Early modern philosophy took the clock as the most powerful image for the coming together of things and for the intelligibility of the world.",
+            "Thought finds ways to concatenate components and produce objects, and the world, investigated, shall reveal the will of its crafter.",
+            "Leibniz grounds pre-established harmony in the notion of the spiritual automata.",
+            "With the steam engine, new problems pressed thought, specially the loss of energy that occurs in recursive cycles.",
+            "The engine was actual before becoming conceptual, in that technics made what science later came to better understand.",
+            "The world became thermodynamical before knowing so, and had to reframe work and energy beyond mechanical intuitions.",
+            "The complexification of technical objects troubled the rationalist philosophical tradition which was the most fond of them.",
+            "'The entropy of the universe tends to a maximum', Clausius wrote in his formalization of the engine's technical problems.",
+            "Soon entropy became a widespread concept, accounting for electrical and informational problems.",
+            "A century later, cybernetics speculated ways to prevent the entropic death of social bodies, which left alone would always disorganize.",
+            "Recursivity ought to be understood not as mere repetition, but as a process of reflexivity in which contingency might emerge and create singularities.",
+            "It can be pictured as a spiral.",
+            "'Where does recursion begin? The search for the beginning is a search for the first cause. While in a circular loop, the beginning is only temporal, but not necessarily a cause. The cause is the totality of the loop'.",
+            "What faces thought, first and foremost, are situations. Linear explanations and mechanical interactions between cause and effect become naive.",
+            "Noise and entropy, deemed malfunctionings in a mechanicist view, become constitutive of reality.",
+            "Human sciences tend to resort to recursivity negatively. Writers emphasize that events might be ordered in many ways.",
+            "Or think the historian's act as creation of monuments, or even react to the paradigm of emergence as something that implies the abdication of agency.",
+            "It could be argued that, on the contrary, the strongest lesson one can take from it is that the truly free gesture can only be comprehended in what it creates.",
+            "Goethe wrote 'he who acts is always without a conscience'. Nietzsche meditates on this in his Untimely Meditations.",
+            "Hegel, for Nietzsche, thought that his prosaic existence in Berlin was the culmination of the world-process, and this idea is deemed altogether paralyzing and depressing.",
+            "His solutions for the malaise of historicism, that defogs the mist of mystery that revolves everything that actuality lives, are two:",
+            "The unhistorically act, of animals, who forget, or of the painter who creates in a critical distance.",
+            "And the suprahistorical, which leads the eye away towards what can bestow eternity, that is, art and religion.",
+            "The truly creative act, for Simondon, is the one that can be information: the one that can resonate, amplify, and create forms.",
+            "There is a positive view of recursivity that makes one put aside questions like the subject of history.",
+            "And instead leads thought to investigate the conditions of historical ontogenesis in the meaningful act.",
+
+            // Reda Ait Alla Epistemic Legacies
+            "Steam power fuelled the 19th-century's expansionist ambitions and craving to dominate the seas, and thus the world.",
+            "Its machinery brought fundamental changes to the material conditions of human life, heralding a new era: the Anthropocene.",
+            "It was the prime mover of the Industrial Revolution, not merely as a technological innovation, but as a potent catalyst.",
+            "Bernard Stiegler identified the steam engine as a pharmacological agent with a dual role.",
+            "A cure that unlocked unprecedented productive power, enabled global mobility, and fuelled the project of modernity.",
+            "But also a poison that disindividuated workers, proletarianized knowledge, and ignited the ecological crisis of the Anthropocene.",
+            "This pharmacological character marks the beginning of a new phase of exosomatization.",
+            "One that reconfigured the very epistemological structures through which humanity relates to Nature, Technology, and itself.",
+            "The triple-helix model is epistemic. It avoids determinism: nature is not a passive backdrop, and technology does not dictate outcomes.",
+            "Instead, it intensifies the existing struggle between two epistemological paradigms within the societal sub-helix.",
+            "Where nomadic and sedentary forces clash to define what counts as valid knowledge and legitimate order.",
+            "The sedentary paradigm is founded on archives, fixed identities, state control, and universal reason.",
+            "The nomadic paradigm is characterized by fluidity, alterity, customary knowledge, and critical movement.",
+            "The pharmacological agent of steam power was a cure in the sense that steamships and railways overcame the logistical constraints of empire.",
+            "Enabling rapid mobilization and the dream of a globalized citizenry.",
+            "Yet, it simultaneously poisoned the international order, intensifying geopolitical rivalries, globalizing warfare.",
+            "Enabling bloody colonialism and imperialism, and scaling conflict to unprecedented levels.",
+            "For us, this was not merely a logistical or political shift, but an epistemological one.",
+            "Steam power reinforced a sedentary, archival logic of state control and linear historical progress.",
+            "While simultaneously empowering nomadic forces of deterritorialization and acceleration that could escape state capture.",
+            "The French invasion of Egypt serves as the quintessential historical moment where it was laid bare.",
+            "It was a collision between the French modernist, sedentary epistemology embodied by Napoleon and his group of scientists and intellectuals.",
+            "And the nomadic epistemology chronicled by Al-Jabarti, a mode of knowing that was relational, custom-based, and contextual.",
+            "This epistemology responded to French universalism with adaptive resistance and reinterpretation, insisting on the primacy of local quiddity.",
+            "This encounter was a battle over the very nature of knowledge itself.",
+            "Al-Razi's epistemology distinguishes between: Al-'ilm al-ijmali (General Knowledge), the knowledge that something exists.",
+            "This is attainable through reason and inference from effect to cause.",
+            "And Al-'ilm al-tafsili (Detailed Knowledge), the knowledge of what something is in its essence.",
+            "Al-Razi argues this is beyond the grasp of reason alone due to ontological and epistemological limits.",
+            "This distinction can be related to the logic of abduction. Formal signs, whose correct usage can be proved by demonstrative logic, lead to general knowledge.",
+            "Antiformal signs, however, do not lead to certain and universally valid knowledge but instead represent a possibility.",
+            "Thus, Al-Razi's distinction maps perfectly onto the triple-helix: we can know that a techne like the steam engine transforms society (general knowledge).",
+            "But we cannot fully know what it is in its totality, its ultimate essence and consequences, without ethical deliberation and spiritual insight.",
+            "This latter form of knowledge can be understood through Suhrawardi's ways of acquiring knowledge.",
+            "'His philosophy is built on the premise that there are two paths: one through reasoning and the reading of signs, and a direct way whereby truth illuminates us through mystical experience, a moment where the knowing subject, the known object, and knowledge itself completely coincide'.",
+            "This epistemological belief 'opens the possibility for a balance between statistical knowledge that uncovers universal patterns and the human right to evaluate these patterns, all while bearing in mind limitations.'",
+            "This paves the way for an engagement with techne guided by epistemic care, steering technological acceleration ethically toward transindividuation.",
+            "A collective, ethical, and spiritually aware mode of existence where technology serves not control, but mutual flourishing.",
+            "This epistemic infrastructure requires us to embrace both reason and mystery.",
+            "It must value General Knowledge, the power of reason, science, and universal principles, alongside Detailed Knowledge.",
+            "The acceptance of limits, respect for context, and openness to alterity and mystery.",
+            "This is nomadic wisdom: the ability to navigate the unknown with ethical responsibility, epistemic care, and a commitment to a future associated milieu.",
+
+            // Ryan Green on Media Technologies
+            "Within the triple helix model of history, a generative mutation in one strand inevitably forces a reconfiguration of the others.",
+            "The Industrial Revolution was such a mutation; the emergence of the steam engine in the technological strand forced society and its relation to nature to be re-conceived through a new, thermodynamic lens.",
+            "Today, we are living through another profound mutation. The co-extensive forces of the computer, the internet, and artificial intelligence have erupted within the technological strand.",
+            "Compelling us to rethink nature and society in terms of computation, information, and memory.",
+            "Yet, the dominant effect of this 'mass media' has been paradoxical: it has atomized society, and by creating an infinite, unstructured archive, it has induced a crisis of historicity itself.",
+            "To escape this impasse, we must re-imagine these technologies not as a passive archive, but as a potential prosthesis for history.",
+            "A structuring agent for a new kind of collective, rational self-consciousness.",
+            "The historical precedent of the steam engine revealed how a new technology became the epistemic lens for its era.",
+            "The engine provided not only power but also a model of reconceptualizing the mind (a la Freud), the market (a la Marx), and Nature (a la Carnot).",
+            "So too with computation. The current crisis, however, stems from the specific character of this mutation.",
+            "While prior media technologies structured shared narratives, today's digital assemblage functions as a near-infinite, yet profoundly disorganized, repository of data.",
+            "This is not an archive in any functional sense; it is a deluge that overwhelms our capacity to form a coherent historical consciousness.",
+            "We are trapped in a perpetual presentism, flooded with information but starved of the structures needed to give it collective meaning.",
+            "This atomization is not an accident but a feature of a media environment engineered to serve the attentional cravings of the market.",
+            "Eroding the shared ground necessary for a political collective to form.",
+            "Is an intervention possible? What if this technological assemblage were engineered not merely to store memory, but to structure it as a tool for reason?",
+            "This reframes the project from one of archival recovery to one of true cognitive enhancement.",
+            "We can draw inspiration from Robert Brandom's concept of recollective rationality, which posits reason not as a detached faculty.",
+            "But as the process of making our implicit commitments and historical assumptions explicit so they can be critiqued and revised.",
+            "History, in this light, is not a set of facts to be remembered, but a set of propositions to be rationally reconstructed.",
+            "A 'prosthesis for history,' then, would be a medium designed to facilitate this very process.",
+            "A tool that helps a collective make its own logic and justifications objects of inspection.",
+            "Such a medium would function not as a mirror, but as an engine of our own self-discovery and revision.",
+            "Through Reza Negarestani's project in Intelligence and Spirit, we can see computational technologies as potentially enabling a form of collective self-reflection.",
+            "Where we test our assumptions about how social systems operate.",
+            "Formal languages become a space in which we can share and test our concepts of the world and ourselves.",
+            "It is this conceptual labor of making explicit our reasons for doing things that the current media systems undercut.",
+            "The most potent symptom of this is the outsourcing of reasoning to correlative AI.",
+            "The predictive logic of the transformer, the dominant architecture of today's large language models, has become emblematic of our historical condition.",
+            "These systems operate by first collapsing cultural artifacts into high-dimensional numerical vectors, or 'embeddings.'",
+            "This embedding is not conceptual; it maps statistical proximities, not logical or causal relations.",
+            "From this position, the model's sole function is to calculate the next most plausible token in a sequence.",
+            "This impressive yet shallow form of generation does not truly create, but merely continues.",
+            "Bloating the unstructured archive with plausible facsimiles of the past.",
+            "It is the paradigm of a history without a model—a technology of endless reproduction, not rational reconceptualization.",
+            "Yet this critique of correlative media does not foreclose a more rationalist and historical use of computation.",
+            "Consider the Schelling model of segregation: it is not a record of a specific historical event.",
+            "But a simple computational tool that retroactively reveals the latent systemic dynamics that can produce segregation even without explicit racist intent.",
+            "By externalizing these dynamics into a model, it makes them available for rational analysis and has profound implications for public policy.",
+            "While the model itself is a conceptual tool, its power is unlocked by the computational medium.",
+            "Which allows us to simulate complex dynamics at a scale impossible for the unaided human mind.",
+            "This is media acting as a structuring agent, not a mere repository.",
+            "It transforms the archive from a source of paralysis into a laboratory for rationalist revision.",
+            "The engineering of a recollective and reconstructive form of media would be a fundamentally political project.",
+            "It would require building platforms that do not simply feed us what we already believe.",
+            "But instead provide us with tools to see why we believe it and to model the consequences of those beliefs.",
+            "Instead of an infinite scroll of contextless facts, imagine interactive platforms that allow communities to simulate the long-term effects of different policy decisions.",
+            "Making the ideological assumptions behind governance visible and contestable.",
+            "This is the difference between a media that feeds the market and one that drives the rationalist revision of our own political models.",
+            "The technologies of digital memory, which now serve to atomize and distract, could be reconfigured as the very prosthesis for the collective, recollective reason required to govern ourselves.",
+            "The choice is not whether to have a technological mediation of history -- this has been the case for millenia.",
+            "The question is whether we will cede historiography to the market or consciously engineer it as a tool for our own collective deliberation.",
+
+            // Steam Engine comprehensive history (selected key passages)
+            "The invention of the steam engine is often portrayed as a singular event, a flash of genius that ignited the Industrial Revolution.",
+            "The historical reality, however, is a more nuanced and compelling story of convergence.",
+            "The engine was not born in a vacuum but was the culmination of a century-long scientific inquiry that fundamentally altered humanity's understanding of the physical world.",
+            "Coupled with a pressing economic crisis that demanded a novel solution.",
+            "For nearly two millennia, Western science had been dominated by the Aristotelian principle of horror vacui—the idea that 'nature abhors a vacuum'.",
+            "This view held that a vacuum was a logical impossibility and that air was an ethereal element without weight.",
+            "The steam engine only became conceivable after this paradigm was decisively overturned by the new experimental science of the 17th century.",
+            "Torricelli correctly deduced that the mercury column was not being pulled up by the vacuum's attraction but was being pushed up and supported by the immense weight of the surrounding air.",
+            "He described humanity as living 'submerged at the bottom of an ocean of the element air'.",
+            "What Torricelli demonstrated scientifically, the German scientist and mayor of Magdeburg, Otto von Guericke, demonstrated dramatically.",
+            "This powerful demonstration made the abstract concept of atmospheric pressure a visceral and undeniable reality.",
+            "Proving that substances were not pulled by a vacuum but were pushed by the pressure of surrounding fluids.",
+            "Papin was the first to theorize a true piston-and-cylinder engine.",
+            "This was the direct theoretical blueprint for the first working steam engine.",
+            "The key insight was not simply that steam was powerful, but that steam was a uniquely convenient medium for creating a vacuum.",
+            "Thereby allowing the well-understood force of the atmosphere to perform mechanical work.",
+            "By the late 17th century, as surface-level deposits were exhausted, coal and tin mines were being dug ever deeper to meet the growing fuel demands of a proto-industrial economy.",
+            "Deeper mines inevitably meant greater problems with flooding, and the traditional horse-powered pumps were becoming prohibitively expensive and technically inadequate for the task.",
+            "Though ingenious, the engine was plagued by severe limitations. Its reliance on high-pressure steam was a constant danger.",
+            "As the era's metallurgy was incapable of producing boilers and joints that could reliably withstand the stress, leading to a propensity for explosions.",
+            "Despite its technical and commercial failures, Savery's engine represented a crucial 'failed success.'",
+            "It was the first device to establish the commercial idea of a steam-powered machine for industry.",
+            "The creator of the first truly practical and robust steam engine was Thomas Newcomen, an ironmonger and blacksmith from Dartmouth.",
+            "His background provided him with the hands-on metallurgical and engineering skills necessary to translate the principles of pneumatics into a durable working machine.",
+            "The Newcomen engine was a true 'atmospheric' engine. It completely abandoned Savery's dangerous reliance on high-pressure steam.",
+            "By using steam at only slightly above atmospheric pressure, Newcomen's design was inherently safe and could be scaled to much larger sizes.",
+            "It was a resounding success. By 1729, over one hundred of these engines were at work across Britain and Europe.",
+            "Reliably draining mines and enabling the extraction of the coal that would fuel the next stage of industrialization.",
+            "For over 60 years, the Newcomen atmospheric engine was the undisputed workhorse of the industrial world.",
+            "The next great leap in steam technology required a shift from empirical craft to scientific analysis.",
+            "This transition was embodied by James Watt, a mathematical instrument maker at the University of Glasgow.",
+            "In 1764, Watt was given the task of repairing a scale model of a Newcomen engine belonging to the university.",
+            "He was struck by its profound inefficiency, observing that the cylinder consumed several times its own volume in steam with each cycle.",
+            "He correctly identified the fundamental flaw: the repeated heating and cooling of the cylinder itself.",
+            "Watt's analysis was informed by his association with the chemist Joseph Black and Black's recent discovery of the principle of latent heat.",
+            "The theory of latent heat explained that a large amount of thermal energy is absorbed or released during a phase change without any change in temperature.",
+            "This provided the theoretical framework for understanding the enormous quantity of heat being wasted in the Newcomen cycle.",
+            "Watt realized that to make the engine efficient, 'it was necessary that the cylinder was always as hot as the steam that entered it'.",
+            "His solution, which came to him in a moment of insight during a Sunday walk in 1765, was the separate condenser.",
+            "Watt's brilliant idea was to perform the condensation not inside the working cylinder, but in a separate, connected vessel that could be kept permanently cool.",
+            "This single invention, patented in 1769, was the greatest single improvement ever made to the steam engine.",
+            "It increased the engine's thermal efficiency nearly fourfold, saving approximately 75% of the fuel cost compared to an equivalent Newcomen engine.",
+            "This dramatic gain in efficiency was the key that unlocked the steam engine's potential.",
+            "It was no longer economically confined to coal mines where fuel was cheap; it could now be profitably deployed anywhere.",
+            "This final innovation transformed the steam engine from a specialized water pump into a universal prime mover.",
+            "Capable of driving the machinery of the burgeoning Industrial Revolution.",
+            "The evolution from Newcomen to Watt represents a profound shift in engineering philosophy.",
+            "The Newcomen engine is a simple, brute-force machine governed by a single control input—the injection of water.",
+            "The Watt engine, by contrast, is a complex, managed system.",
+            "This transition from a simple cycle to a sophisticated, self-regulating system of control is a microcosm of the broader transformation of the Industrial Revolution itself.",
+            "A move from the mere application of power to the systematic management of industrial processes for maximum efficiency and profit.",
+            "Watt was not just an inventor; he was one of the world's first true systems engineers.",
+            "In a profound reversal of the modern paradigm where scientific discovery typically precedes technological application, the steam engine stands as a paramount example of technology creating a new field of science.",
+            "The engine, a product of decades of empirical tinkering and craft-based engineering, became the central object of study that gave rise to the science of thermodynamics.",
+            "The practical quest to understand and optimize this machine led directly to the discovery of some of the most fundamental laws of nature.",
+            "Carnot's genius was to abstract the real-world engine into an idealized theoretical cycle—the 'Carnot Cycle'.",
+            "And to propose a powerful analogy. He argued that a heat engine functions like a water wheel.",
+            "Just as a water wheel derives mechanical work from water falling from a high elevation to a low one, a heat engine derives work from heat 'falling' from a high temperature to a low temperature.",
+            "Furthermore, the steam engine forced a revolution in the very concept of 'work' and 'energy.'",
+            "Before the engine, energy was primarily understood in mechanical terms—the visible motion of objects or their position in a gravitational field.",
+            "The steam engine presented a new, more mysterious transformation: the chemical energy in coal was converted into invisible heat, which in turn was converted into powerful, visible, mechanical work.",
+            "For the philosopher and economist Karl Marx, the steam engine was the ultimate physical embodiment of the capitalist mode of production.",
+            "He saw it not as a neutral instrument of human progress, but as a revolutionary weapon in the class struggle.",
+            "A machine that fundamentally transformed social relations, intensified the exploitation of labor, and laid bare the inherent contradictions of capital.",
+            "In Das Kapital, Marx argued that the primary purpose of machinery under capitalism is not to lighten the worker's load but to increase the production of 'surplus-value.'",
+            "By dramatically increasing labor productivity, the machine shortens the portion of the workday the laborer needs to produce the value of their own wages.",
+            "Thereby lengthening the portion they work for free for the capitalist.",
+            "The relentless, non-biological rhythm of the steam engine dictates the pace of the entire factory.",
+            "The worker, once a skilled artisan in control of their tools, is reduced to a mere 'attendant' of the machine.",
+            "Performing repetitive, monotonous tasks in time with its movements.",
+            "By replacing the need for muscular strength, the engine allowed capitalists to draw women and children into the factory workforce.",
+            "This flooded the labor market, depressing the wages of adult male workers and bringing every member of the family under the direct control of capital.",
+            "Just as the steam engine provided a new model for understanding society and the cosmos, it also offered a powerful paradigm for the inner world of the human mind.",
+            "The dominant technology of the 19th century—the steam engine and its underlying science of thermodynamics—provided Sigmund Freud with a pervasive and structuring metaphor for his revolutionary model of the human psyche.",
+            "The Freudian mind, in its architecture and dynamics, is a psychodynamic steam engine.",
+            "Freud conceived of the psyche not as a spiritual entity but as a psychic 'apparatus,' a system for managing, channeling, and transforming energy.",
+            "This 'economic' model is a direct metaphorical application of the principles of thermodynamics that emerged from the study of steam engines.",
+            "Libido is a quantifiable, mobile energy that flows through the psychic apparatus.",
+            "It can be invested in objects or ideas, blocked, or transformed, but like energy in a closed thermodynamic system, it can neither be created nor destroyed.",
+            "The Id is the boiler, the primitive, unconscious source of instinctual drives and raw libidinal energy that constantly generates pressure.",
+            "The Ego is the engine's complex regulating machinery—the valves, pistons, and governor—which attempts to manage the Id's powerful pressures.",
+            "And release them in ways that are compatible with the demands of external reality.",
+            "When the Ego deems an impulse from the Id to be unacceptable, it engages in 'repression'—it blocks the valve and bottles up the psychic pressure.",
+            "This repressed energy does not vanish. Like steam in a sealed boiler, the pressure builds until it finds an alternative outlet.",
+            "'Exploding elsewhere as a neurotic symptom' that the conscious mind cannot understand.",
+            "The goal of psychoanalysis is catharsis—the safe release of pent-up emotional energy.",
+            "The therapist acts as a kind of psychic engineer or 'technician-mechanic,' helping the patient, whose mind is a 'broken' machine.",
+            "To identify the sources of pressure and open the appropriate valves, making the unconscious conscious and relieving the symptomatic tension.",
+            "Beyond its influence on specific scientific and philosophical theories, the steam engine became the supreme icon of the 19th-century's defining ideology: the idea of Progress.",
+            "It was tangible, noisy, and powerful proof of humanity's capacity for seemingly limitless technological and social advancement.",
+            "It embodied a new and dominant relationship with nature, time, and space that fueled the optimistic spirit of the age.",
+            "For centuries, human productivity had been tethered to the limits of muscle, wind, and water.",
+            "The steam engine represented a final liberation from these natural constraints.",
+            "It was hailed as the 'most valuable present which the arts of life have ever received from the philosopher,' a testament to human reason's ability to harness the fundamental forces of nature.",
+            "When applied to transportation, the engine radically reshaped human experience.",
+            "The steam locomotive and the steamship collapsed geography, making travel and trade faster, cheaper, and more reliable than ever before.",
+            "This created a 'tightly integrated world economy' and fostered a sense of a shrinking, more connected globe.",
+            "The engine was the visible driver of unprecedented economic and social transformation.",
+            "By enabling the factory system, it created new forms of wealth, spurred the growth of a new industrial middle class.",
+            "And fundamentally reordered society, pulling populations from the countryside into new, sprawling industrial cities built around factories rather than rivers.",
+            "The steam engine created a powerful positive feedback loop of technological advancement.",
+            "Better engines enabled the mining of more coal, which provided cheaper fuel for more engines.",
+            "They powered more precise metalworking tools, which were then used to build stronger and more efficient engines.",
+            "This accelerating, self-reinforcing cycle of improvement—where each innovation created the conditions for the next—became synonymous with the very idea of progress itself.",
+            "However, the engine's role as a symbol of progress was profoundly double-edged.",
+            "While it fueled utopian optimism about a future of abundance and human mastery, its dark consequences simultaneously gave rise to the 19th century's most powerful counter-narratives.",
+            "The brutal exploitation in factories, the squalor of industrial slums, and the blackening of the skies with coal smoke.",
+            "The Romantic movement, with figures like Thomas Carlyle denouncing the 'steam-powered mechanization of the mind,' was a direct reaction against the perceived soullessness of the industrial age.",
+            "And as has been shown, Marx's entire critique of capitalism was a response to the new forms of alienation and exploitation made possible by the factory system that the steam engine created.",
+            "The steam engine, therefore, did not create a simple, monolithic idea of progress.",
+            "Instead, it created a profound societal and intellectual schism.",
+            "It was the central object around which the great debates of modernity were fought: capital versus labor, industry versus nature, progress versus tradition.",
+            "It powered both the utopian dreams and the dystopian critiques of the modern age.",
+
+            // Lena Nguyen
+            "Under which circumstances do we declare a historical rupture, where such rupture is understood not as an event so shocking and unexpected that history's course suddenly changes, but as a shift in the mode in which its products - nature, technology and society - condition each other?",
+            "Where the subsequent events are generated according to a new pattern and represent the nexus of a different type of relation between nature, technology and society?",
+            "With slight variations, a number of theses claim that the latest historical rupture can be observed on the basis of an altered temporality.",
+            "François Hartog describes a regime of presentism, in which the horizon of expectation contracts into a permanent now, history and future alike subordinated to an eternal present tense.",
+            "Hito Steyerl suggests that work has transitioned into occupation, that is, activity without ends, a continuous absorption that suspends the distinction between labor and leisure, between production and display.",
+            "Mark Fisher observes the effects of a new temporality on culture, declaring the slow cancellation of the future.",
+            "Armen Avanessian writes of the post-contemporary: a time in which the future arrives before the present, in which predictive systems and financial instruments craft today out of tomorrow, preempting what has not yet occurred.",
+            "Under the current temporal regime, occupation garners new meanings. Steyerl's concept of occupation describes an action that does not culminate in a result, but facilitates an ongoing capture.",
+            "In the military register, occupation identifies the control of territory. Supplemented by predictive systems, occupation expands its capture to time.",
+            "An occupied population is not only subject to means of direct physical and psychological control, but to wagers that anticipate its future.",
+            "To the potential of every gesture being 'detected' as a threat of dissent.",
+            "The war on terror sends drones as agents from the future, occupying and overdetermining the potential of the present before it can unfold.",
+            "Strike first, find the enemy later, a sure success in the inversion of future and present.",
+            "Today, the commitment to being on the right side of history. yes, out of fashion, but wholly necessary, she says.",
+            "Is it the belief that history will find its truthful reconstruction in the future, or is it the ambition to come out as its victorious writers?",
+            "Is it, more simply, the belief in any future at all?",
+            "Loyalty to truth as belief in the future, in future as that which will prove right.",
+            "Here, a display of political impotence, of goodness postponed, of clinging onto the day of judgement.",
+
+            // Murilo Netto - Freud, Lacan and the Machine
+            "During his lifetime, René Descartes proposed a whole array of new ideas that, whether truly novel or 'merely' reframings of older ones, nevertheless secured him an important place in the pantheon of the thinkers who launched Europe into modernity.",
+            "Among these ideas is a mind/body dualism that would echo in Western thought throughout the centuries: that between the thinking mind and the material body as totally distinct types of substances.",
+            "Descartes thus presented his contemporaries with a purely mechanical conception of the animal body, according to which an animal, devoid of a thinking mind, is nothing more than an automaton, a machine made of organic matter.",
+            "Modern philosophy, according to the psychoanalyst, developed around the idea of 'the identification of man with his knowledge'.",
+            "While on the side of modern medicine '[t]he physician has with respect to the body the attitude of the man who dismantles a machine'.",
+            "This is precisely the context in which Lacan locates Freud as a turning point: psychoanalysis is born as an attempt to address the philosophical question from a physician's point of view.",
+            "This is clearest in Freud's first attempt at a theoretical work, his 1895 Project for a Scientific Psychology.",
+            "In which the father of psychoanalysis tries to account for the genesis and structure of the human mind in a way that dispenses with any reliance on subjectivist descriptions.",
+            "To the point that it could even be mapped onto a mathematical model.",
+            "After all, Freud was not the first to propose an a-subjective description of the development and the workings of the mind.",
+            "As Lacan rightfully points out, he was preceded by a kind of radical empiricism best represented by Condillac's Traité des Sensations.",
+            "In which the the Enlightenment thinker proposed a model according to which, says Lacan, 'the scent of the rose seems a very solid starting point, out of which the entire psychic edifice has to be drawn, without any apparent difficulty, like a rabbit from a hat'.",
+            "In other words, Condillac radicalizes Locke's tabula rasa by theorizing the way in which, from simple direct interactions with the sensible word, the mind literally comes into being.",
+            "The difference between Condillac and Freud, notices Lacan, is that 'For Condillac, as for others, more comes out than was put in. They were metaphysicians.'",
+            "'At some point it was realised that to draw the rabbit out of the hat you always have to have put it in beforehand. That is the principle of energetics, and that is why energetics is also a metaphysics'.",
+            "If there already were precursors to the endeavor of thinking the structure of the mind from a mechanical standpoint, what enabled Freud to come up with a new version of the same concept?",
+            "Or, in other words, why didn't Condillac come up with the idea of the pleasure principle?",
+            "The answer, for Lacan, is as intriguing as it is provocative: 'Because [...] he didn't have a formula for it, because he came before the steam engine.",
+            "The era of the steam engine, its industrial exploitation, and administrative projects and balance-sheets, were needed, for us to ask the question—what does a machine yield?'",
+            "While the machine in Descartes' mind was a clock, the machine in the mind of modern biologists, notes Lacan, is the homeostat.",
+            "A machine capable of adjusting itself to the environment by means of an energetic economy; and it is from this conceptual terrain that Freud launches himself into the quest for the subject.",
+            "'Freud's whole discussion revolves around that question, what, in terms of energy, is the psyche?'",
+            "Lacan himself, however, was writing at a historical moment when the rapid development of the formal sciences was reshaping the way we understood science.",
+            "And if psychoanalysis, as the French thinker maintained, stems from scientific thought, then the way scientific discourse determines the way we think about ourselves also had to change.",
+            "A prime example of this overcoming of the 19th-century scientific worldview is in Lacan's rejection of the energetic model of the psyche in favor of a new concept of the machine.",
+            "'If we know how to reveal the meaning of this energy myth, we see the emergence of what was, from the start and without it being understood, implicit in the metaphor of the human body as a machine. Here we see the manifestation of a certain beyond of the inter-human reference, which is in all strictness the symbolic beyond.'",
+            "This time, machines are conceptualized through their relation to cybernetics—that is, as means of computing and processing information.",
+            "While the homeostats that shaped Freud's imagination were themselves cybernetic systems, the early-20-century advent of the formal sciences revealed that transposing the idea of a machine to different kinds of systems was no mere analogy: the machine is the relational process at play.",
+            "During this period, concepts previously thought to be empirical were formalized.",
+            "With information theory, for example, we discovered that entropy is not a thermodynamical concept, but a statistical one that was merely discovered in the context of thermodynamics.",
+            "Similarly, the suggestion of conceptualizing the unconscious as a machine no longer required, as it did for Freud, for us to speak of it in terms of an energetic system.",
+            "As if it was composed of elements akin to those of a homeostatic steam engine—its machinic aspect is, after all, simply the way information is structurally dealt with in order to keep the stability and functioning of the system.",
+            "In this way, Lacan, along with Claude Lévi-Strauss, was able to see that what we call the unconscious concerns the living dynamic of language itself, and that language can be thought of as a literal machine.",
+            "The transposal of this new definition of the machine onto the machinic Freudian pleasure principle by Lacan is evident in how, for example, in The Instance of the Letter in the Unconscious, he interprets the primary processes of condensation and displacement as the linguistic operations of metaphor and metonymy.",
+            "From this point on, the pleasure principle is no longer about lowering the levels of psychic energy, but about the incorporation of new information into an unconscious body of signifying chains.",
+            "The shaping of theory through technology takes another turn with the notion of the Virtual Machine.",
+            "Aaron Sloman points out how the development of software engineering provided us with concrete examples that can be used to build a new model of the mind.",
+            "One that avoids both metaphysical reliance on immaterial entities and physicalist reductionism.",
+            "The virtual machine is a kind of information-processing system that emerges from physical conditions in such a way that its features cannot be mirrored onto the physical machine it supervenes upon.",
+            "Making it so that the relations between the physical processes that sustain the information processing of the virtual machine can only be intelligible through descriptions that rely on the vocabulary of the virtual machine itself.",
+            "Just as even the most thorough description of the physical relations of causation at play in a game of chess cannot give any sufficient reason for those sequences of events, requiring us to use the vocabulary of chess.",
+            "So does a virtual machine such as an email system, for example, operates in ways that cannot be made sense of even with the most complete description of the workings of the physical aspect of the devices connected to this email system.",
+            "According to Sloman, we must think of the mind-brain relationship in the same way.",
+            "Elaborating from Sloman's work, Reza Negarestani links this way of thinking about the nature of intelligence to the Hegelian concept of Geist in order to show that the individual must be thought of as an instantiation of a larger communal structure.",
+            "Individuated by the recognition relations that this larger working structure, this virtual machine, is composed of.",
+            "Is this not precisely what Lacan was working toward at the dawn of cybernetics and of computer science?",
+            "Just as the steam engine shaped Freud's understanding of the human mind, we see now how the technology of the information age updates, in Negaretani's work, our understanding of the same object yet again.",
+            "The picture we're left with, then, is that of the historical interplay between the ways technology shapes the way we conceive of nature and ourselves.",
+            "With Freud and the biologists influenced by the homeostats; the way the theoretical work developed in this era, sprouted from a machinic conception of the world, helps reshape the world and technology itself, birthing the information age.",
+            "And finally, how this new technological and societal paradigm reshapes yet again the way we think about nature and about ourselves.",
+            "As seen in the works of Sloman and Negarestani, where the Virtual Machine Functionalism already somewhat anticipated by Lacan is once again put forward.",
+            "This time not only in the context of theory, but in light of the concrete world this theory helped shape.",
+            "The interplay between Nature, Technology and Society shapes history everywhere—not just in politics, but in the history of our very ideas."
         ];
 
-        const links = [
-            // Temporal flows
-            { source: "steam_era", target: "cybernetic_era", type: "temporal" },
-            { source: "cybernetic_era", target: "computational_crisis", type: "temporal" },
-            { source: "computational_crisis", target: "presentism", type: "temporal" },
-            { source: "presentism", target: "occupation_time", type: "temporal" },
-            { source: "thermodynamic_time", target: "helical_cycles", type: "temporal" },
+        // Text processing functions
+        function parseTextIntoChunks(texts) {
+            const chunks = [];
             
-            // Epistemic shifts
-            { source: "steam_episteme", target: "freud_machine", type: "epistemic" },
-            { source: "freud_machine", target: "lacan_language", type: "epistemic" },
-            { source: "lacan_language", target: "infrastructure_pedagogy", type: "epistemic" },
-            { source: "razi_distinction", target: "suhrawardi_illumination", type: "epistemic" },
-            { source: "steam_episteme", target: "razi_distinction", type: "epistemic" },
+            texts.forEach(text => {
+                // Split into sentences, clean and filter
+                const sentences = text.split(/[.!?]+/)
+                    .map(s => s.trim())
+                    .filter(s => s.length > 50 && s.length < 400) // Reasonable length chunks
+                    .map(s => {
+                        // Clean up formatting artifacts
+                        return s.replace(/^\d+\.\s*/, '') // Remove numbering
+                                .replace(/^[•\-\*]\s*/, '') // Remove bullets
+                                .replace(/\s+/g, ' ') // Normalize whitespace
+                                .trim();
+                    })
+                    .filter(s => s.length > 30); // Final length check
+                
+                chunks.push(...sentences);
+            });
             
-            // Recursive loops
-            { source: "recursion_beginning", target: "spiral_process", type: "recursive" },
-            { source: "spiral_process", target: "triple_helix_mutation", type: "recursive" },
-            { source: "actual_before_conceptual", target: "steam_era", type: "recursive" },
-            { source: "triple_helix_mutation", target: "entropy_constitution", type: "recursive" },
-            { source: "helical_cycles", target: "recursion_beginning", type: "recursive" },
-            
-            // Anti-capture resistance
-            { source: "metabolic_rift", target: "return_vector", type: "anticapture" },
-            { source: "return_vector", target: "open_processes", type: "anticapture" },
-            { source: "nomadic_sedentary", target: "recollective_rationality", type: "anticapture" },
-            { source: "leaks_matter", target: "entropy_constitution", type: "anticapture" },
-            { source: "open_processes", target: "leaks_matter", type: "anticapture" },
-            
-            // Cross-quadrant connections
-            { source: "engine", target: "recursion_beginning", type: "connection" },
-            { source: "engine", target: "steam_episteme", type: "connection" },
-            { source: "engine", target: "computational_crisis", type: "connection" },
-            { source: "engine", target: "return_vector", type: "connection" },
-            
-            // Inter-quadrant flows
-            { source: "steam_era", target: "steam_episteme", type: "connection" },
-            { source: "actual_before_conceptual", target: "steam_episteme", type: "connection" },
-            { source: "infrastructure_pedagogy", target: "computational_crisis", type: "connection" },
-            { source: "occupation_time", target: "metabolic_rift", type: "connection" },
-            { source: "entropy_constitution", target: "leaks_matter", type: "connection" },
-            { source: "suhrawardi_illumination", target: "nomadic_sedentary", type: "connection" }
-        ];
+            return chunks;
+        }
 
-        // Get SVG element
+        function categorizeChunk(chunk) {
+            const temporal_keywords = ['time', 'temporality', 'cycle', 'rhythm', 'present', 'future', 'history', 'era', 'period', 'occupation', 'presentism'];
+            const epistemic_keywords = ['knowledge', 'epistemic', 'reason', 'science', 'understanding', 'theory', 'concept', 'paradigm', 'mind', 'consciousness'];
+            const recursive_keywords = ['recursive', 'loop', 'spiral', 'repetition', 'feedback', 'circular', 'return', 'iteration', 'mutation', 'entropy'];
+            const anticapture_keywords = ['capture', 'commons', 'resistance', 'nomadic', 'sedentary', 'open', 'protocol', 'leak', 'circulation', 'platform'];
+            
+            const lowerChunk = chunk.toLowerCase();
+            
+            let scores = {
+                temporal: temporal_keywords.reduce((sum, word) => sum + (lowerChunk.includes(word) ? 1 : 0), 0),
+                epistemic: epistemic_keywords.reduce((sum, word) => sum + (lowerChunk.includes(word) ? 1 : 0), 0),
+                recursive: recursive_keywords.reduce((sum, word) => sum + (lowerChunk.includes(word) ? 1 : 0), 0),
+                anticapture: anticapture_keywords.reduce((sum, word) => sum + (lowerChunk.includes(word) ? 1 : 0), 0)
+            };
+            
+            // Find category with highest score, or assign randomly if tied
+            let maxScore = Math.max(...Object.values(scores));
+            if (maxScore === 0) {
+                const categories = ['temporal', 'epistemic', 'recursive', 'anticapture'];
+                return categories[Math.floor(Math.random() * categories.length)];
+            }
+            
+            let candidates = Object.keys(scores).filter(key => scores[key] === maxScore);
+            return candidates[Math.floor(Math.random() * candidates.length)];
+        }
+
+        function generateRandomNodes() {
+            const chunks = parseTextIntoChunks(textCorpus);
+            const selectedChunks = [];
+            
+            // Randomly sample 22-26 chunks
+            const numChunks = 22 + Math.floor(Math.random() * 5);
+            const usedIndices = new Set();
+            
+            while (selectedChunks.length < numChunks && usedIndices.size < chunks.length) {
+                const randomIndex = Math.floor(Math.random() * chunks.length);
+                if (!usedIndices.has(randomIndex)) {
+                    usedIndices.add(randomIndex);
+                    selectedChunks.push(chunks[randomIndex]);
+                }
+            }
+            
+            // Generate nodes
+            const nodes = [];
+            
+            // Always include the central engine
+            nodes.push({
+                id: "engine",
+                label: "RECURSIVE\nHISTORY",
+                type: "engine",
+                quadrant: "center",
+                x: 700,
+                y: 500
+            });
+            
+            // Create nodes from selected chunks
+            selectedChunks.forEach((chunk, index) => {
+                const category = categorizeChunk(chunk);
+                const truncatedChunk = chunk.length > 180 ? chunk.substring(0, 177) + "..." : chunk;
+                
+                // Assign initial positions based on category
+                let x, y;
+                const jitter = 150; // Amount of random spread
+                
+                switch(category) {
+                    case 'temporal':
+                        x = 250 + (Math.random() - 0.5) * jitter;
+                        y = 200 + (Math.random() - 0.5) * jitter;
+                        break;
+                    case 'epistemic':
+                        x = 1150 + (Math.random() - 0.5) * jitter;
+                        y = 200 + (Math.random() - 0.5) * jitter;
+                        break;
+                    case 'recursive':
+                        x = 250 + (Math.random() - 0.5) * jitter;
+                        y = 700 + (Math.random() - 0.5) * jitter;
+                        break;
+                    case 'anticapture':
+                        x = 1150 + (Math.random() - 0.5) * jitter;
+                        y = 700 + (Math.random() - 0.5) * jitter;
+                        break;
+                }
+                
+                nodes.push({
+                    id: `chunk_${index}`,
+                    label: truncatedChunk,
+                    type: category,
+                    quadrant: category,
+                    x: Math.max(50, Math.min(1350, x)),
+                    y: Math.max(50, Math.min(950, y))
+                });
+            });
+            
+            return nodes;
+        }
+
+        function generateRandomLinks(nodes) {
+            const links = [];
+            const contentNodes = nodes.filter(n => n.type !== 'engine');
+            
+            // Connect engine to some random nodes
+            const engineConnections = Math.min(4, contentNodes.length);
+            const shuffledNodes = [...contentNodes].sort(() => 0.5 - Math.random());
+            
+            for (let i = 0; i < engineConnections; i++) {
+                links.push({
+                    source: "engine",
+                    target: shuffledNodes[i].id,
+                    type: "connection"
+                });
+            }
+            
+            // Create some random connections between nodes of same type
+            const typeGroups = {};
+            contentNodes.forEach(node => {
+                if (!typeGroups[node.type]) typeGroups[node.type] = [];
+                typeGroups[node.type].push(node);
+            });
+            
+            Object.keys(typeGroups).forEach(type => {
+                const nodesOfType = typeGroups[type];
+                if (nodesOfType.length > 1) {
+                    const numConnections = Math.min(3, Math.floor(nodesOfType.length / 2));
+                    for (let i = 0; i < numConnections; i++) {
+                        const sourceIdx = Math.floor(Math.random() * nodesOfType.length);
+                        let targetIdx = Math.floor(Math.random() * nodesOfType.length);
+                        while (targetIdx === sourceIdx) {
+                            targetIdx = Math.floor(Math.random() * nodesOfType.length);
+                        }
+                        
+                        links.push({
+                            source: nodesOfType[sourceIdx].id,
+                            target: nodesOfType[targetIdx].id,
+                            type: type
+                        });
+                    }
+                }
+            });
+            
+            // Add some cross-quadrant connections
+            const numCrossConnections = Math.min(6, Math.floor(contentNodes.length / 4));
+            for (let i = 0; i < numCrossConnections; i++) {
+                const sourceIdx = Math.floor(Math.random() * contentNodes.length);
+                let targetIdx = Math.floor(Math.random() * contentNodes.length);
+                while (targetIdx === sourceIdx || contentNodes[sourceIdx].type === contentNodes[targetIdx].type) {
+                    targetIdx = Math.floor(Math.random() * contentNodes.length);
+                }
+                
+                links.push({
+                    source: contentNodes[sourceIdx].id,
+                    target: contentNodes[targetIdx].id,
+                    type: "connection"
+                });
+            }
+            
+            return links;
+        }
+
+        // Global variables
+        let nodes = [];
+        let links = [];
         const svg = document.getElementById('network');
         const width = 1400;
         const height = 1000;
+        let nodeMap = {};
+        let nodeGroups = new Map();
 
-        // Create node lookup for links
-        const nodeMap = {};
-        nodes.forEach(node => nodeMap[node.id] = node);
+        // Initialize on page load
+        function initializeDiagram() {
+            generateNewSelection();
+        }
 
-        // Store links data globally for updates
-        window.linksData = links;
-        window.nodeGroups = new Map();
-
-        // Estimate text dimensions and set box sizes
-        nodes.forEach(node => {
-            const fontSize = node.type === "engine" ? 14 : 9;
-            const maxWidth = node.type === "engine" ? 120 : 280;
-            const lines = wrapText(node.label, maxWidth / (fontSize * 0.6));
-            node.width = Math.min(maxWidth, Math.max(...lines.map(line => line.length * fontSize * 0.6))) + 20;
-            node.height = lines.length * fontSize * 1.2 + 20;
-            node.lines = lines;
-        });
-
+        // Text processing and node sizing
         function wrapText(text, maxCharsPerLine) {
             const words = text.split(' ');
             const lines = [];
@@ -456,7 +968,18 @@
             return lines;
         }
 
-        // Draw quadrant dividers
+        function calculateNodeDimensions() {
+            nodes.forEach(node => {
+                const fontSize = node.type === "engine" ? 14 : 9;
+                const maxWidth = node.type === "engine" ? 120 : 300;
+                const lines = wrapText(node.label, maxWidth / (fontSize * 0.6));
+                node.width = Math.min(maxWidth, Math.max(...lines.map(line => line.length * fontSize * 0.6))) + 20;
+                node.height = lines.length * fontSize * 1.2 + 20;
+                node.lines = lines;
+            });
+        }
+
+        // Drawing functions
         function drawQuadrants() {
             // Vertical line
             const vLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -494,25 +1017,25 @@
             });
         }
 
-        // Draw links
         function drawLinks() {
             links.forEach(link => {
                 const sourceNode = nodeMap[link.source];
                 const targetNode = nodeMap[link.target];
                 
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                const dx = targetNode.x - sourceNode.x;
-                const dy = targetNode.y - sourceNode.y;
-                const dr = Math.sqrt(dx * dx + dy * dy) * 1.2;
-                const pathData = `M${sourceNode.x},${sourceNode.y}A${dr},${dr} 0 0,1 ${targetNode.x},${targetNode.y}`;
-                
-                path.setAttribute('d', pathData);
-                path.setAttribute('class', `link link-${link.type}`);
-                svg.appendChild(path);
+                if (sourceNode && targetNode) {
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    const dx = targetNode.x - sourceNode.x;
+                    const dy = targetNode.y - sourceNode.y;
+                    const dr = Math.sqrt(dx * dx + dy * dy) * 1.2;
+                    const pathData = `M${sourceNode.x},${sourceNode.y}A${dr},${dr} 0 0,1 ${targetNode.x},${targetNode.y}`;
+                    
+                    path.setAttribute('d', pathData);
+                    path.setAttribute('class', `link link-${link.type}`);
+                    svg.appendChild(path);
+                }
             });
         }
 
-        // Draw nodes
         function drawNodes() {
             nodes.forEach(node => {
                 const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -520,8 +1043,7 @@
                 group.setAttribute('transform', `translate(${node.x}, ${node.y})`);
                 group.setAttribute('data-node-id', node.id);
                 
-                // Store reference for easy access
-                window.nodeGroups.set(node.id, group);
+                nodeGroups.set(node.id, group);
                 
                 // Rectangle
                 const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -542,89 +1064,113 @@
                 });
                 
                 // Add drag behavior
-                let isDragging = false;
-                let startX, startY, offsetX, offsetY;
-                
-                function onMouseDown(e) {
-                    isDragging = true;
-                    const rect = svg.getBoundingClientRect();
-                    startX = e.clientX - rect.left;
-                    startY = e.clientY - rect.top;
-                    offsetX = startX - node.x;
-                    offsetY = startY - node.y;
-                    group.classList.add('dragging');
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-                
-                function onMouseMove(e) {
-                    if (!isDragging) return;
-                    const rect = svg.getBoundingClientRect();
-                    const newX = e.clientX - rect.left - offsetX;
-                    const newY = e.clientY - rect.top - offsetY;
-                    
-                    // Constrain to boundaries
-                    node.x = Math.max(node.width/2 + 50, Math.min(width - node.width/2 - 50, newX));
-                    node.y = Math.max(node.height/2 + 50, Math.min(height - node.height/2 - 50, newY));
-                    
-                    group.setAttribute('transform', `translate(${node.x}, ${node.y})`);
-                    updateLinks();
-                    e.preventDefault();
-                }
-                
-                function onMouseUp(e) {
-                    if (!isDragging) return;
-                    isDragging = false;
-                    group.classList.remove('dragging');
-                    e.preventDefault();
-                }
-                
-                // Add event listeners to the group
-                group.addEventListener('mousedown', onMouseDown);
-                document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onMouseUp);
-                
-                // Prevent text selection
-                group.addEventListener('selectstart', e => e.preventDefault());
+                addDragBehavior(group, node);
                 
                 svg.appendChild(group);
             });
         }
 
+        function addDragBehavior(group, node) {
+            let isDragging = false;
+            let startX, startY, offsetX, offsetY;
+            
+            function onMouseDown(e) {
+                isDragging = true;
+                const rect = svg.getBoundingClientRect();
+                startX = e.clientX - rect.left;
+                startY = e.clientY - rect.top;
+                offsetX = startX - node.x;
+                offsetY = startY - node.y;
+                group.classList.add('dragging');
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            function onMouseMove(e) {
+                if (!isDragging) return;
+                const rect = svg.getBoundingClientRect();
+                const newX = e.clientX - rect.left - offsetX;
+                const newY = e.clientY - rect.top - offsetY;
+                
+                node.x = Math.max(node.width/2 + 50, Math.min(width - node.width/2 - 50, newX));
+                node.y = Math.max(node.height/2 + 50, Math.min(height - node.height/2 - 50, newY));
+                
+                group.setAttribute('transform', `translate(${node.x}, ${node.y})`);
+                updateLinks();
+                e.preventDefault();
+            }
+            
+            function onMouseUp(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                group.classList.remove('dragging');
+                e.preventDefault();
+            }
+            
+            group.addEventListener('mousedown', onMouseDown);
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+            group.addEventListener('selectstart', e => e.preventDefault());
+        }
+
         function updateLinks() {
             const linkElements = svg.querySelectorAll('.link');
             linkElements.forEach((linkElement, i) => {
-                const linkData = window.linksData[i];
-                const sourceNode = nodeMap[linkData.source];
-                const targetNode = nodeMap[linkData.target];
-                const dx = targetNode.x - sourceNode.x;
-                const dy = targetNode.y - sourceNode.y;
-                const dr = Math.sqrt(dx * dx + dy * dy) * 1.2;
-                const pathData = `M${sourceNode.x},${sourceNode.y}A${dr},${dr} 0 0,1 ${targetNode.x},${targetNode.y}`;
-                linkElement.setAttribute('d', pathData);
+                if (i < links.length) {
+                    const linkData = links[i];
+                    const sourceNode = nodeMap[linkData.source];
+                    const targetNode = nodeMap[linkData.target];
+                    
+                    if (sourceNode && targetNode) {
+                        const dx = targetNode.x - sourceNode.x;
+                        const dy = targetNode.y - sourceNode.y;
+                        const dr = Math.sqrt(dx * dx + dy * dy) * 1.2;
+                        const pathData = `M${sourceNode.x},${sourceNode.y}A${dr},${dr} 0 0,1 ${targetNode.x},${targetNode.y}`;
+                        linkElement.setAttribute('d', pathData);
+                    }
+                }
             });
         }
 
-        // Initialize diagram
-        drawQuadrants();
-        drawLinks();
-        drawNodes();
+        function clearDiagram() {
+            svg.innerHTML = '';
+            nodeGroups.clear();
+            nodeMap = {};
+        }
+
+        function renderDiagram() {
+            clearDiagram();
+            
+            // Create node lookup
+            nodes.forEach(node => nodeMap[node.id] = node);
+            
+            calculateNodeDimensions();
+            drawQuadrants();
+            drawLinks();
+            drawNodes();
+        }
 
         // Global functions
+        window.generateNewSelection = function() {
+            nodes = generateRandomNodes();
+            links = generateRandomLinks(nodes);
+            renderDiagram();
+        };
+
         window.resetAllNodes = function() {
             nodes.forEach(node => {
                 if (node.quadrant === "temporal") {
-                    node.x = width/4 + (Math.random() - 0.5) * 200;
-                    node.y = height/4 + (Math.random() - 0.5) * 200;
+                    node.x = 250 + (Math.random() - 0.5) * 150;
+                    node.y = 200 + (Math.random() - 0.5) * 150;
                 } else if (node.quadrant === "epistemic") {
-                    node.x = 3*width/4 + (Math.random() - 0.5) * 200;
-                    node.y = height/4 + (Math.random() - 0.5) * 200;
+                    node.x = 1150 + (Math.random() - 0.5) * 150;
+                    node.y = 200 + (Math.random() - 0.5) * 150;
                 } else if (node.quadrant === "recursive") {
-                    node.x = width/4 + (Math.random() - 0.5) * 200;
-                    node.y = 3*height/4 + (Math.random() - 0.5) * 200;
+                    node.x = 250 + (Math.random() - 0.5) * 150;
+                    node.y = 700 + (Math.random() - 0.5) * 150;
                 } else if (node.quadrant === "anticapture") {
-                    node.x = 3*width/4 + (Math.random() - 0.5) * 200;
-                    node.y = 3*height/4 + (Math.random() - 0.5) * 200;
+                    node.x = 1150 + (Math.random() - 0.5) * 150;
+                    node.y = 700 + (Math.random() - 0.5) * 150;
                 } else {
                     node.x = width/2;
                     node.y = height/2;
@@ -634,12 +1180,7 @@
                 node.y = Math.max(node.height/2 + 50, Math.min(height - node.height/2 - 50, node.y));
             });
             
-            // Redraw everything
-            svg.innerHTML = '';
-            window.nodeGroups.clear();
-            drawQuadrants();
-            drawLinks();
-            drawNodes();
+            renderDiagram();
         };
 
         window.exportText = function() {
@@ -689,20 +1230,20 @@
 
                 let textContent = "RECURSIVE TEMPORALITIES: EPISTEMIC MUTATIONS & ANTI-CAPTURE STRATEGIES\n";
                 textContent += "=" + "=".repeat(70) + "\n\n";
-                textContent += "Framework: This document reflects the current spatial arrangement of concepts as positioned in the interactive diagram.\n\n";
+                textContent += "Framework: This document reflects the current spatial arrangement of randomly sampled concepts from the theoretical corpus.\n\n";
 
                 const quadrantOrder = ['temporal', 'epistemic', 'recursive', 'anticapture'];
                 
                 quadrantOrder.forEach(quadrant => {
-                    const nodes = quadrantGroups[quadrant];
+                    const quadrantNodes = quadrantGroups[quadrant];
                     
                     textContent += quadrantNames[quadrant] + "\n";
                     textContent += "-".repeat(quadrantNames[quadrant].length) + "\n";
                     
-                    if (nodes.length > 0) {
-                        textContent += `(${nodes.length} concepts arranged in this quadrant)\n\n`;
+                    if (quadrantNodes.length > 0) {
+                        textContent += `(${quadrantNodes.length} concepts arranged in this quadrant)\n\n`;
                         
-                        nodes.forEach((node, index) => {
+                        quadrantNodes.forEach((node, index) => {
                             const cleanText = node.label.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
                             textContent += `${index + 1}. ${cleanText}\n\n`;
                         });
@@ -716,14 +1257,15 @@
                 const currentDate = new Date().toLocaleDateString();
                 const currentTime = new Date().toLocaleTimeString();
                 textContent += "\n" + "-".repeat(70) + "\n";
-                textContent += `Exported from Recursive Temporalities Diagram on ${currentDate} at ${currentTime}\n`;
+                textContent += `Randomly sampled from corpus and exported on ${currentDate} at ${currentTime}\n`;
+                textContent += "Generate new selection to discover different conceptual configurations.\n";
 
                 const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
                 const blob = new Blob([textContent], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `recursive_temporalities_arrangement_${timestamp}.txt`;
+                a.download = `recursive_temporalities_random_${timestamp}.txt`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -745,6 +1287,9 @@
                 alert('Export failed. Check console for details.');
             }
         };
+
+        // Initialize the diagram
+        document.addEventListener('DOMContentLoaded', initializeDiagram);
     </script>
 </body>
 </html>
