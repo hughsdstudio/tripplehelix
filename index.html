@@ -680,10 +680,48 @@
                 .transition().duration(1000).style("stroke", null);
         };
 
-        // Global function to export text content
+        // Global function to export text content based on current node positions
         window.exportText = function() {
-            // Define quadrant order (clockwise from top-right)
-            const quadrantOrder = ['epistemic', 'anticapture', 'recursive', 'temporal'];
+            // Get current node positions and filter out quadrant labels and engine
+            const contentNodes = data.nodes.filter(d => d.type !== 'quadrant' && d.type !== 'engine');
+            
+            // Determine which quadrant each node is currently in based on position
+            const categorizeByPosition = (node) => {
+                const isLeft = node.x < width/2;
+                const isTop = node.y < height/2;
+                
+                if (isTop && !isLeft) return 'epistemic';
+                if (!isTop && !isLeft) return 'anticapture';
+                if (!isTop && isLeft) return 'recursive';
+                if (isTop && isLeft) return 'temporal';
+                return 'center';
+            };
+
+            // Group nodes by their current quadrant positions
+            const quadrantGroups = {
+                'epistemic': [],
+                'anticapture': [],
+                'recursive': [],
+                'temporal': []
+            };
+
+            contentNodes.forEach(node => {
+                const currentQuadrant = categorizeByPosition(node);
+                if (quadrantGroups[currentQuadrant]) {
+                    quadrantGroups[currentQuadrant].push(node);
+                }
+            });
+
+            // Sort nodes within each quadrant by position (top-to-bottom, then left-to-right)
+            Object.keys(quadrantGroups).forEach(quadrant => {
+                quadrantGroups[quadrant].sort((a, b) => {
+                    if (Math.abs(a.y - b.y) < 50) { // If roughly same row
+                        return a.x - b.x; // Sort left to right
+                    }
+                    return a.y - b.y; // Sort top to bottom
+                });
+            });
+
             const quadrantNames = {
                 'epistemic': 'EPISTEMIC MUTATIONS',
                 'anticapture': 'ANTI-CAPTURE STRATEGIES', 
@@ -691,20 +729,24 @@
                 'temporal': 'TEMPORAL REGIMES'
             };
 
+            // Build text content based on current arrangement
             let textContent = "RECURSIVE TEMPORALITIES: EPISTEMIC MUTATIONS & ANTI-CAPTURE STRATEGIES\n";
             textContent += "=" + "=".repeat(70) + "\n\n";
-            textContent += "Framework: This document maps the recursive dynamics between temporal regimes, epistemic mutations, and strategies of capture/commons across technological paradigms. Each section represents a distinct but interconnected domain of analysis.\n\n";
+            textContent += "Framework: This document reflects the current spatial arrangement of concepts as positioned in the interactive diagram. The order below follows the real-time layout, creating a unique narrative flow based on how the nodes have been arranged.\n\n";
 
-            // Process each quadrant in clockwise order
+            // Process quadrants in clockwise order from top-right
+            const quadrantOrder = ['epistemic', 'anticapture', 'recursive', 'temporal'];
+            
             quadrantOrder.forEach(quadrant => {
-                const quadrantNodes = data.nodes.filter(d => d.quadrant === quadrant && d.type !== 'quadrant');
+                const nodes = quadrantGroups[quadrant];
                 
-                if (quadrantNodes.length > 0) {
+                if (nodes.length > 0) {
                     textContent += quadrantNames[quadrant] + "\n";
-                    textContent += "-".repeat(quadrantNames[quadrant].length) + "\n\n";
+                    textContent += "-".repeat(quadrantNames[quadrant].length) + "\n";
+                    textContent += `(${nodes.length} concepts arranged in this quadrant)\n\n`;
                     
-                    quadrantNodes.forEach((node, index) => {
-                        // Clean up the text - remove HTML breaks and extra whitespace
+                    nodes.forEach((node, index) => {
+                        // Clean up the text
                         const cleanText = node.label
                             .replace(/\n/g, ' ')
                             .replace(/\s+/g, ' ')
@@ -714,21 +756,28 @@
                     });
                     
                     textContent += "\n";
+                } else {
+                    textContent += quadrantNames[quadrant] + "\n";
+                    textContent += "-".repeat(quadrantNames[quadrant].length) + "\n";
+                    textContent += "(No concepts currently positioned in this quadrant)\n\n\n";
                 }
             });
 
-            // Add footer with current date
+            // Add metadata about the current arrangement
             const currentDate = new Date().toLocaleDateString();
+            const currentTime = new Date().toLocaleTimeString();
             textContent += "\n" + "-".repeat(70) + "\n";
-            textContent += `Exported from Recursive Temporalities Diagram on ${currentDate}\n`;
-            textContent += "Interactive diagram available at: [URL where hosted]\n";
+            textContent += `Exported from Recursive Temporalities Diagram on ${currentDate} at ${currentTime}\n`;
+            textContent += "This text reflects the spatial arrangement of concepts at the time of export.\n";
+            textContent += "Rearranging nodes and re-exporting will create a different narrative flow.\n";
 
-            // Create and download file
+            // Create and download file with timestamp
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
             const blob = new Blob([textContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'recursive_temporalities_text_export.txt';
+            a.download = `recursive_temporalities_arrangement_${timestamp}.txt`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
