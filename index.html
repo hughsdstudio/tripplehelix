@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recursive Temporalities & Epistemic Mutations</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <style>
         body {
             margin: 0;
@@ -76,6 +75,7 @@
             cursor: pointer;
             font-size: 0.85rem;
             margin-bottom: 12px;
+            margin-right: 8px;
         }
         
         .reset-button:hover {
@@ -110,120 +110,107 @@
             border: 1px solid #ddd;
             background: white;
             touch-action: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
             user-select: none;
+            overflow: hidden;
         }
         
-        .diagram-container {
-            overflow: hidden;
-            touch-action: pan-x pan-y;
+        .node {
+            cursor: move;
+        }
+        
+        .node-rect {
+            fill: rgba(255, 255, 255, 0.1);
+            stroke: #141416;
+            stroke-width: 2;
+            rx: 8;
+            ry: 8;
         }
         
         .node-quadrant {
-            fill: none;
-            stroke: #141416;
-            stroke-width: 3;
             stroke-dasharray: 10,5;
-            cursor: pointer;
+            stroke-width: 3;
         }
         
         .node-temporal {
-            fill: none;
-            stroke: #141416;
-            stroke-width: 2;
             stroke-dasharray: 5,3;
-            cursor: pointer;
         }
         
         .node-epistemic {
-            fill: none;
-            stroke: #141416;
-            stroke-width: 2;
             stroke-dasharray: 8,4,2,4;
-            cursor: pointer;
         }
         
         .node-recursive {
-            fill: none;
-            stroke: #141416;
-            stroke-width: 2;
             stroke-dasharray: 3,6;
-            cursor: pointer;
         }
         
         .node-anticapture {
-            fill: none;
-            stroke: #141416;
-            stroke-width: 2;
             stroke-dasharray: 12,3,3,3;
-            cursor: pointer;
         }
         
         .node-engine {
-            fill: none;
-            stroke: #141416;
             stroke-width: 4;
-            cursor: pointer;
+            fill: rgba(240, 248, 255, 0.2);
         }
         
-        .node:hover {
+        .node:hover .node-rect {
             stroke-width: 3;
+            fill: rgba(248, 248, 255, 0.3);
+        }
+        
+        .node.dragging .node-rect {
+            stroke: #14aa8c;
+            stroke-width: 3;
+            fill: rgba(232, 248, 245, 0.4);
         }
         
         .node-text {
-            font-size: 10px;
+            font-size: 9px;
             text-anchor: middle;
+            dominant-baseline: middle;
             pointer-events: none;
-            font-weight: 500;
+            fill: #141416;
         }
         
         .node-text-large {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
         }
         
         .node-text-engine {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: bold;
         }
         
-        .link-temporal {
-            stroke: #141416;
-            stroke-dasharray: 5,3;
+        .link {
             fill: none;
+            stroke: #141416;
+            stroke-width: 1.5;
+        }
+        
+        .link-temporal {
+            stroke-dasharray: 5,3;
         }
         
         .link-epistemic {
-            stroke: #141416;
             stroke-dasharray: 8,4,2,4;
-            fill: none;
         }
         
         .link-recursive {
-            stroke: #141416;
             stroke-dasharray: 3,6;
-            fill: none;
         }
         
         .link-anticapture {
-            stroke: #141416;
             stroke-dasharray: 12,3,3,3;
-            fill: none;
         }
         
         .link-connection {
-            stroke: #141416;
             stroke-opacity: 0.4;
             stroke-dasharray: 1,3;
-            fill: none;
         }
         
         .axis-line {
             stroke: #141416;
             stroke-width: 1.5;
-            marker-end: url(#arrowhead);
         }
         
         .axis-label {
@@ -239,12 +226,6 @@
             text-anchor: middle;
             fill: #525257;
             opacity: 0.7;
-        }
-        
-        .grid-line {
-            stroke: #525257;
-            stroke-opacity: 0.2;
-            stroke-width: 1;
         }
     </style>
 </head>
@@ -284,12 +265,11 @@
             <div class="legend">
                 <h3>Controls</h3>
                 <button class="reset-button" onclick="resetAllNodes()">Reset Layout</button>
-                <button class="reset-button" onclick="exportText()" style="margin-left: 8px;">Export Text</button>
+                <button class="reset-button" onclick="exportText()">Export Text</button>
                 <div class="instructions">
-                    • Drag nodes to position them<br>
-                    • Double-click to unlock nodes<br>
-                    • Nodes lock when moved<br>
-                    • Export creates .txt file with all content
+                    • <strong>Drag nodes to position them</strong><br>
+                    • Nodes stay where you place them<br>
+                    • Export creates .txt file with arrangement
                 </div>
                 
                 <h3>Legend</h3>
@@ -333,236 +313,139 @@
     </div>
 
     <script>
-        // Network data structure with longer text content
-        const data = {
-            nodes: [
-                // Central engine
-                { id: "engine", label: "RECURSIVE\nHISTORY", type: "engine", group: "center", quadrant: "center" },
-                
-                // Quadrant Labels
-                { id: "temporal_label", label: "TEMPORAL REGIMES", type: "quadrant", group: "top-left", quadrant: "temporal" },
-                { id: "epistemic_label", label: "EPISTEMIC MUTATIONS", type: "quadrant", group: "top-right", quadrant: "epistemic" },
-                { id: "recursive_label", label: "RECURSIVITY PROBLEM", type: "quadrant", group: "bottom-left", quadrant: "recursive" },
-                { id: "anticapture_label", label: "ANTI-CAPTURE STRATEGIES", type: "quadrant", group: "bottom-right", quadrant: "anticapture" },
-                
-                // TEMPORAL REGIMES (Top-Left Quadrant)
-                { id: "steam_era", label: "Steam era: 'Because he didn't have a formula for it, because he came before the steam engine. The era of the steam engine and administrative balance-sheets were needed for us to ask: what does a machine yield?'", type: "temporal", group: "top-left", quadrant: "temporal" },
-                
-                { id: "thermodynamic_time", label: "Thermodynamic cycles: 'Maximum efficiency demands reversibility that no real engine attains. History flirts with reversibility in myths of restoration, yet every cycle completes with hysteresis.'", type: "temporal", group: "top-left", quadrant: "temporal" },
-                
-                { id: "cybernetic_era", label: "Cybernetic shift: 'With information theory, we discovered that entropy is not thermodynamical, but statistical. The machine is the relational process at play.'", type: "temporal", group: "top-left", quadrant: "temporal" },
-                
-                { id: "computational_crisis", label: "Computational temporality: 'The future arrives before the present. Predictive systems and financial instruments craft today out of tomorrow, preempting what has not yet occurred.'", type: "temporal", group: "top-left", quadrant: "temporal" },
-                
-                { id: "presentism", label: "Regime of presentism: 'The horizon of expectation contracts into a permanent now, history and future alike subordinated to an eternal present tense.'", type: "temporal", group: "top-left", quadrant: "temporal" },
-                
-                { id: "occupation_time", label: "Work as occupation: 'Activity without ends, continuous absorption that suspends the distinction between labor and leisure, between production and display.'", type: "temporal", group: "top-left", quadrant: "temporal" },
-                
-                // EPISTEMIC MUTATIONS (Top-Right Quadrant)
-                { id: "steam_episteme", label: "Steam's conceptual revolution: 'The steam engine forced a revolution in the very concept of work and energy, expanding definition from simple mechanics to universal principle of thermodynamics.'", type: "epistemic", group: "top-right", quadrant: "epistemic" },
-                
-                { id: "freud_machine", label: "Psyche as steam engine: 'Freud's whole discussion revolves around that question: what, in terms of energy, is the psyche? The mind became a pressure system—drives, repression, release.'", type: "epistemic", group: "top-right", quadrant: "epistemic" },
-                
-                { id: "lacan_language", label: "Language as machine: 'The unconscious concerns the living dynamic of language itself, and language can be thought of as a literal machine. What we call unconscious is language.'", type: "epistemic", group: "top-right", quadrant: "epistemic" },
-                
-                { id: "infrastructure_pedagogy", label: "Technologies teach: 'Technologies teach us how to imagine ourselves. The boiler gives us the energetic unconscious; statistical engines sponsor a subject of prediction and prompt.'", type: "epistemic", group: "top-right", quadrant: "epistemic" },
-                
-                { id: "razi_distinction", label: "Al-Razi's epistemology: 'We can know that a techne like the steam engine transforms society (general knowledge), but cannot fully know what it is in its totality without ethical deliberation.'", type: "epistemic", group: "top-right", quadrant: "epistemic" },
-                
-                { id: "suhrawardi_illumination", label: "Suhrawardi's paths: 'There are two paths: reasoning and reading of signs, and a direct way whereby truth illuminates us through mystical experience, where subject, object, and knowledge coincide.'", type: "epistemic", group: "top-right", quadrant: "epistemic" },
-                
-                // RECURSIVITY PROBLEM (Bottom-Left Quadrant)
-                { id: "recursion_beginning", label: "Circular causation: 'Where does recursion begin? The search for the beginning is a search for first cause. In a circular loop, the beginning is only temporal. The cause is the totality of the loop.'", type: "recursive", group: "bottom-left", quadrant: "recursive" },
-                
-                { id: "spiral_process", label: "Recursivity as spiral: 'Recursivity ought to be understood not as mere repetition, but as a process of reflexivity in which contingency might emerge and create singularities.'", type: "recursive", group: "bottom-left", quadrant: "recursive" },
-                
-                { id: "triple_helix_mutation", label: "Systemic reconfiguration: 'A generative mutation in one strand inevitably forces a reconfiguration of the others. The steam engine forced society and nature to be reconceived through thermodynamic lens.'", type: "recursive", group: "bottom-left", quadrant: "recursive" },
-                
-                { id: "actual_before_conceptual", label: "Technology precedes theory: 'The engine was actual before becoming conceptual. Technics made what science later came to better understand. The world became thermodynamical before knowing so.'", type: "recursive", group: "bottom-left", quadrant: "recursive" },
-                
-                { id: "helical_cycles", label: "Historical hysteresis: 'Cycles remain, but they are helical cycles—recurrences displaced along an axis of irretrievable transformation. The path back is not the path out.'", type: "recursive", group: "bottom-left", quadrant: "recursive" },
-                
-                { id: "entropy_constitution", label: "Waste as constitutive: 'No conversion is free. Entropy is not afterthought: waste heat is constitutive. Each historical advance generates its externalities—the helix advances by spending itself.'", type: "recursive", group: "bottom-left", quadrant: "recursive" },
-                
-                // ANTI-CAPTURE STRATEGIES (Bottom-Right Quadrant)
-                { id: "metabolic_rift", label: "Metabolic rift: 'When residues are enclosed by platforms, IP regimes, or markets, the cultural cycle suffers metabolic rift: outputs no longer fertilize collective reasoning.'", type: "anticapture", group: "bottom-right", quadrant: "anticapture" },
-                
-                { id: "return_vector", label: "Return vs capture: 'The metabolic force of artistic residue depends on its return vector to the general intellect. Anti-capture design keeps residues circulating as public nutrients.'", type: "anticapture", group: "bottom-right", quadrant: "anticapture" },
-                
-                { id: "nomadic_sedentary", label: "Nomadic vs sedentary: 'Nomadic epistemology is characterized by fluidity, alterity, customary knowledge. Sedentary paradigm is founded on archives, fixed identities, state control, universal reason.'", type: "anticapture", group: "bottom-right", quadrant: "anticapture" },
-                
-                { id: "open_processes", label: "Protocol transparency: 'Open processes, composable toolchains, provenance credentials that block commodification while preserving pedagogy become integral to inhuman labor itself.'", type: "anticapture", group: "bottom-right", quadrant: "anticapture" },
-                
-                { id: "recollective_rationality", label: "Recollective media: 'What if technological assemblage were engineered not merely to store memory, but to structure it as tool for reason? History as propositions to be rationally reconstructed.'", type: "anticapture", group: "bottom-right", quadrant: "anticapture" },
-                
-                { id: "leaks_matter", label: "Productive leaks: 'Engines leak: heat, steam, noise, time. Some of most consequential innovations are re-routings of the leak—capturing waste heat, revaluing idleness as study.'", type: "anticapture", group: "bottom-right", quadrant: "anticapture" }
-            ],
+        // Data structure with expanded content nodes
+        const nodes = [
+            // Central engine
+            { id: "engine", label: "RECURSIVE\nHISTORY", type: "engine", quadrant: "center", x: 700, y: 500 },
             
-            links: [
-                // Temporal flows (orange dashed)
-                { source: "steam_era", target: "cybernetic_era", type: "temporal" },
-                { source: "cybernetic_era", target: "computational_crisis", type: "temporal" },
-                { source: "computational_crisis", target: "presentism", type: "temporal" },
-                { source: "presentism", target: "occupation_time", type: "temporal" },
-                { source: "thermodynamic_time", target: "helical_cycles", type: "temporal" },
-                
-                // Epistemic shifts (purple dashed)
-                { source: "steam_episteme", target: "freud_machine", type: "epistemic" },
-                { source: "freud_machine", target: "lacan_language", type: "epistemic" },
-                { source: "lacan_language", target: "infrastructure_pedagogy", type: "epistemic" },
-                { source: "razi_distinction", target: "suhrawardi_illumination", type: "epistemic" },
-                { source: "steam_episteme", target: "razi_distinction", type: "epistemic" },
-                
-                // Recursive loops (green dash-dot)
-                { source: "recursion_beginning", target: "spiral_process", type: "recursive" },
-                { source: "spiral_process", target: "triple_helix_mutation", type: "recursive" },
-                { source: "actual_before_conceptual", target: "steam_era", type: "recursive" },
-                { source: "triple_helix_mutation", target: "entropy_constitution", type: "recursive" },
-                { source: "helical_cycles", target: "recursion_beginning", type: "recursive" },
-                
-                // Anti-capture resistance (red dashed)
-                { source: "metabolic_rift", target: "return_vector", type: "anticapture" },
-                { source: "return_vector", target: "open_processes", type: "anticapture" },
-                { source: "nomadic_sedentary", target: "recollective_rationality", type: "anticapture" },
-                { source: "leaks_matter", target: "entropy_constitution", type: "anticapture" },
-                { source: "open_processes", target: "leaks_matter", type: "anticapture" },
-                
-                // Cross-quadrant connections (weak gray)
-                { source: "engine", target: "recursion_beginning", type: "connection" },
-                { source: "engine", target: "steam_episteme", type: "connection" },
-                { source: "engine", target: "computational_crisis", type: "connection" },
-                { source: "engine", target: "return_vector", type: "connection" },
-                
-                // Inter-quadrant flows
-                { source: "steam_era", target: "steam_episteme", type: "connection" },
-                { source: "actual_before_conceptual", target: "steam_episteme", type: "connection" },
-                { source: "infrastructure_pedagogy", target: "computational_crisis", type: "connection" },
-                { source: "occupation_time", target: "metabolic_rift", type: "connection" },
-                { source: "entropy_constitution", target: "leaks_matter", type: "connection" },
-                { source: "suhrawardi_illumination", target: "nomadic_sedentary", type: "connection" }
-            ]
-        };
+            // TEMPORAL REGIMES (Top-Left Quadrant)
+            { id: "steam_era", label: "Steam era: 'Because he didn't have a formula for it, because he came before the steam engine. The era of the steam engine and administrative balance-sheets were needed for us to ask: what does a machine yield?'", type: "temporal", quadrant: "temporal", x: 250, y: 150 },
+            
+            { id: "thermodynamic_time", label: "Thermodynamic cycles: 'Maximum efficiency demands reversibility that no real engine attains. History flirts with reversibility in myths of restoration, yet every cycle completes with hysteresis.'", type: "temporal", quadrant: "temporal", x: 400, y: 200 },
+            
+            { id: "cybernetic_era", label: "Cybernetic shift: 'With information theory, we discovered that entropy is not thermodynamical, but statistical. The machine is the relational process at play.'", type: "temporal", quadrant: "temporal", x: 300, y: 300 },
+            
+            { id: "computational_crisis", label: "Computational temporality: 'The future arrives before the present. Predictive systems and financial instruments craft today out of tomorrow, preempting what has not yet occurred.'", type: "temporal", quadrant: "temporal", x: 150, y: 250 },
+            
+            { id: "presentism", label: "Regime of presentism: 'The horizon of expectation contracts into a permanent now, history and future alike subordinated to an eternal present tense.'", type: "temporal", quadrant: "temporal", x: 200, y: 400 },
+            
+            { id: "occupation_time", label: "Work as occupation: 'Activity without ends, continuous absorption that suspends the distinction between labor and leisure, between production and display.'", type: "temporal", quadrant: "temporal", x: 350, y: 350 },
+            
+            // EPISTEMIC MUTATIONS (Top-Right Quadrant)
+            { id: "steam_episteme", label: "Steam's conceptual revolution: 'The steam engine forced a revolution in the very concept of work and energy, expanding definition from simple mechanics to universal principle of thermodynamics.'", type: "epistemic", quadrant: "epistemic", x: 1000, y: 150 },
+            
+            { id: "freud_machine", label: "Psyche as steam engine: 'Freud's whole discussion revolves around that question: what, in terms of energy, is the psyche? The mind became a pressure system—drives, repression, release.'", type: "epistemic", quadrant: "epistemic", x: 1150, y: 250 },
+            
+            { id: "lacan_language", label: "Language as machine: 'The unconscious concerns the living dynamic of language itself, and language can be thought of as a literal machine. What we call unconscious is language.'", type: "epistemic", quadrant: "epistemic", x: 900, y: 300 },
+            
+            { id: "infrastructure_pedagogy", label: "Technologies teach: 'Technologies teach us how to imagine ourselves. The boiler gives us the energetic unconscious; statistical engines sponsor a subject of prediction and prompt.'", type: "epistemic", quadrant: "epistemic", x: 1200, y: 350 },
+            
+            { id: "razi_distinction", label: "Al-Razi's epistemology: 'We can know that a techne like the steam engine transforms society (general knowledge), but cannot fully know what it is in its totality without ethical deliberation.'", type: "epistemic", quadrant: "epistemic", x: 950, y: 200 },
+            
+            { id: "suhrawardi_illumination", label: "Suhrawardi's paths: 'There are two paths: reasoning and reading of signs, and a direct way whereby truth illuminates us through mystical experience, where subject, object, and knowledge coincide.'", type: "epistemic", quadrant: "epistemic", x: 1100, y: 400 },
+            
+            // RECURSIVITY PROBLEM (Bottom-Left Quadrant)
+            { id: "recursion_beginning", label: "Circular causation: 'Where does recursion begin? The search for the beginning is a search for first cause. In a circular loop, the beginning is only temporal. The cause is the totality of the loop.'", type: "recursive", quadrant: "recursive", x: 200, y: 650 },
+            
+            { id: "spiral_process", label: "Recursivity as spiral: 'Recursivity ought to be understood not as mere repetition, but as a process of reflexivity in which contingency might emerge and create singularities.'", type: "recursive", quadrant: "recursive", x: 350, y: 750 },
+            
+            { id: "triple_helix_mutation", label: "Systemic reconfiguration: 'A generative mutation in one strand inevitably forces a reconfiguration of the others. The steam engine forced society and nature to be reconceived through thermodynamic lens.'", type: "recursive", quadrant: "recursive", x: 400, y: 600 },
+            
+            { id: "actual_before_conceptual", label: "Technology precedes theory: 'The engine was actual before becoming conceptual. Technics made what science later came to better understand. The world became thermodynamical before knowing so.'", type: "recursive", quadrant: "recursive", x: 250, y: 800 },
+            
+            { id: "helical_cycles", label: "Historical hysteresis: 'Cycles remain, but they are helical cycles—recurrences displaced along an axis of irretrievable transformation. The path back is not the path out.'", type: "recursive", quadrant: "recursive", x: 150, y: 700 },
+            
+            { id: "entropy_constitution", label: "Waste as constitutive: 'No conversion is free. Entropy is not afterthought: waste heat is constitutive. Each historical advance generates its externalities—the helix advances by spending itself.'", type: "recursive", quadrant: "recursive", x: 300, y: 550 },
+            
+            // ANTI-CAPTURE STRATEGIES (Bottom-Right Quadrant)
+            { id: "metabolic_rift", label: "Metabolic rift: 'When residues are enclosed by platforms, IP regimes, or markets, the cultural cycle suffers metabolic rift: outputs no longer fertilize collective reasoning.'", type: "anticapture", quadrant: "anticapture", x: 1000, y: 650 },
+            
+            { id: "return_vector", label: "Return vs capture: 'The metabolic force of artistic residue depends on its return vector to the general intellect. Anti-capture design keeps residues circulating as public nutrients.'", type: "anticapture", quadrant: "anticapture", x: 1200, y: 750 },
+            
+            { id: "nomadic_sedentary", label: "Nomadic vs sedentary: 'Nomadic epistemology is characterized by fluidity, alterity, customary knowledge. Sedentary paradigm is founded on archives, fixed identities, state control, universal reason.'", type: "anticapture", quadrant: "anticapture", x: 900, y: 600 },
+            
+            { id: "open_processes", label: "Protocol transparency: 'Open processes, composable toolchains, provenance credentials that block commodification while preserving pedagogy become integral to inhuman labor itself.'", type: "anticapture", quadrant: "anticapture", x: 1100, y: 800 },
+            
+            { id: "recollective_rationality", label: "Recollective media: 'What if technological assemblage were engineered not merely to store memory, but to structure it as tool for reason? History as propositions to be rationally reconstructed.'", type: "anticapture", quadrant: "anticapture", x: 950, y: 750 },
+            
+            { id: "leaks_matter", label: "Productive leaks: 'Engines leak: heat, steam, noise, time. Some of most consequential innovations are re-routings of the leak—capturing waste heat, revaluing idleness as study.'", type: "anticapture", quadrant: "anticapture", x: 1150, y: 550 }
+        ];
 
-        // Set up SVG with anti-zoom measures
-        const svg = d3.select("#network");
-        const width = +svg.attr("width");
-        const height = +svg.attr("height");
+        const links = [
+            // Temporal flows
+            { source: "steam_era", target: "cybernetic_era", type: "temporal" },
+            { source: "cybernetic_era", target: "computational_crisis", type: "temporal" },
+            { source: "computational_crisis", target: "presentism", type: "temporal" },
+            { source: "presentism", target: "occupation_time", type: "temporal" },
+            { source: "thermodynamic_time", target: "helical_cycles", type: "temporal" },
+            
+            // Epistemic shifts
+            { source: "steam_episteme", target: "freud_machine", type: "epistemic" },
+            { source: "freud_machine", target: "lacan_language", type: "epistemic" },
+            { source: "lacan_language", target: "infrastructure_pedagogy", type: "epistemic" },
+            { source: "razi_distinction", target: "suhrawardi_illumination", type: "epistemic" },
+            { source: "steam_episteme", target: "razi_distinction", type: "epistemic" },
+            
+            // Recursive loops
+            { source: "recursion_beginning", target: "spiral_process", type: "recursive" },
+            { source: "spiral_process", target: "triple_helix_mutation", type: "recursive" },
+            { source: "actual_before_conceptual", target: "steam_era", type: "recursive" },
+            { source: "triple_helix_mutation", target: "entropy_constitution", type: "recursive" },
+            { source: "helical_cycles", target: "recursion_beginning", type: "recursive" },
+            
+            // Anti-capture resistance
+            { source: "metabolic_rift", target: "return_vector", type: "anticapture" },
+            { source: "return_vector", target: "open_processes", type: "anticapture" },
+            { source: "nomadic_sedentary", target: "recollective_rationality", type: "anticapture" },
+            { source: "leaks_matter", target: "entropy_constitution", type: "anticapture" },
+            { source: "open_processes", target: "leaks_matter", type: "anticapture" },
+            
+            // Cross-quadrant connections
+            { source: "engine", target: "recursion_beginning", type: "connection" },
+            { source: "engine", target: "steam_episteme", type: "connection" },
+            { source: "engine", target: "computational_crisis", type: "connection" },
+            { source: "engine", target: "return_vector", type: "connection" },
+            
+            // Inter-quadrant flows
+            { source: "steam_era", target: "steam_episteme", type: "connection" },
+            { source: "actual_before_conceptual", target: "steam_episteme", type: "connection" },
+            { source: "infrastructure_pedagogy", target: "computational_crisis", type: "connection" },
+            { source: "occupation_time", target: "metabolic_rift", type: "connection" },
+            { source: "entropy_constitution", target: "leaks_matter", type: "connection" },
+            { source: "suhrawardi_illumination", target: "nomadic_sedentary", type: "connection" }
+        ];
 
-        // Prevent zoom behaviors
-        svg.on("wheel", function(event) {
-            event.preventDefault();
-            event.stopPropagation();
+        // Get SVG element
+        const svg = document.getElementById('network');
+        const width = 1400;
+        const height = 1000;
+
+        // Create node lookup for links
+        const nodeMap = {};
+        nodes.forEach(node => nodeMap[node.id] = node);
+
+        // Store links data globally for updates
+        window.linksData = links;
+        window.nodeGroups = new Map();
+
+        // Estimate text dimensions and set box sizes
+        nodes.forEach(node => {
+            const fontSize = node.type === "engine" ? 14 : 9;
+            const maxWidth = node.type === "engine" ? 120 : 280;
+            const lines = wrapText(node.label, maxWidth / (fontSize * 0.6));
+            node.width = Math.min(maxWidth, Math.max(...lines.map(line => line.length * fontSize * 0.6))) + 20;
+            node.height = lines.length * fontSize * 1.2 + 20;
+            node.lines = lines;
         });
-        
-        svg.on("dblclick", function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-        });
 
-        // Create arrow markers
-        svg.append("defs").append("marker")
-            .attr("id", "arrowhead")
-            .attr("viewBox", "0 -5 10 10")
-            .attr("refX", 8)
-            .attr("refY", 0)
-            .attr("markerWidth", 6)
-            .attr("markerHeight", 6)
-            .attr("orient", "auto")
-            .append("path")
-            .attr("d", "M0,-5L10,0L0,5")
-            .attr("fill", "#141416");
-
-        // Create main container group
-        const mainGroup = svg.append("g").attr("class", "main-container");
-
-        // Add quadrant dividers
-        mainGroup.append("line")
-            .attr("class", "axis-line")
-            .attr("x1", width/2).attr("y1", 50)
-            .attr("x2", width/2).attr("y2", height-50);
-            
-        mainGroup.append("line")
-            .attr("class", "axis-line")
-            .attr("x1", 50).attr("y1", height/2)
-            .attr("x2", width-50).attr("y2", height/2);
-
-        // Add quadrant labels
-        mainGroup.append("text")
-            .attr("class", "quadrant-label")
-            .attr("x", width/4)
-            .attr("y", 30)
-            .text("TEMPORAL REGIMES");
-            
-        mainGroup.append("text")
-            .attr("class", "quadrant-label")
-            .attr("x", 3*width/4)
-            .attr("y", 30)
-            .text("EPISTEMIC MUTATIONS");
-            
-        mainGroup.append("text")
-            .attr("class", "quadrant-label")
-            .attr("x", width/4)
-            .attr("y", height-20)
-            .text("RECURSIVITY PROBLEM");
-            
-        mainGroup.append("text")
-            .attr("class", "quadrant-label")
-            .attr("x", 3*width/4)
-            .attr("y", height-20)
-            .text("ANTI-CAPTURE STRATEGIES");
-
-        // Create force simulation with quadrant positioning and dynamic collision
-        const simulation = d3.forceSimulation(data.nodes)
-            .force("link", d3.forceLink(data.links).id(d => d.id).distance(140))
-            .force("charge", d3.forceManyBody().strength(-400))
-            .force("center", d3.forceCenter(width / 2, height / 2))
-            .force("collision", d3.forceCollide().radius(d => Math.max(d.textWidth, d.textHeight) / 2 + 10))
-            .force("x", d3.forceX(d => {
-                if (d.quadrant === "temporal") return width/4;
-                if (d.quadrant === "epistemic") return 3*width/4;
-                if (d.quadrant === "recursive") return width/4;
-                if (d.quadrant === "anticapture") return 3*width/4;
-                return width/2;
-            }).strength(0.3))
-            .force("y", d3.forceY(d => {
-                if (d.quadrant === "temporal") return height/4;
-                if (d.quadrant === "epistemic") return height/4;
-                if (d.quadrant === "recursive") return 3*height/4;
-                if (d.quadrant === "anticapture") return 3*height/4;
-                return height/2;
-            }).strength(0.3));
-
-        // Add links
-        const link = mainGroup.append("g")
-            .selectAll("path")
-            .data(data.links)
-            .enter().append("path")
-            .attr("class", d => `link-${d.type}`)
-            .attr("stroke-width", 1.5);
-
-        // Add nodes
-        const node = mainGroup.append("g")
-            .selectAll("g")
-            .data(data.nodes)
-            .enter().append("g")
-            .attr("class", "node")
-            .call(d3.drag()
-                .on("start", dragstarted)
-                .on("drag", dragged)
-                .on("end", dragended));
-
-        // Function to estimate text dimensions
-        function estimateTextDimensions(text, fontSize, maxWidth) {
+        function wrapText(text, maxCharsPerLine) {
             const words = text.split(' ');
-            const avgCharWidth = fontSize * 0.6; // Approximate character width
-            const lineHeight = fontSize * 1.2;
-            
-            let lines = [];
+            const lines = [];
             let currentLine = '';
             
             for (let word of words) {
                 const testLine = currentLine ? currentLine + ' ' + word : word;
-                if (testLine.length * avgCharWidth <= maxWidth) {
+                if (testLine.length <= maxCharsPerLine) {
                     currentLine = testLine;
                 } else {
                     if (currentLine) lines.push(currentLine);
@@ -570,253 +453,298 @@
                 }
             }
             if (currentLine) lines.push(currentLine);
-            
-            const width = Math.min(maxWidth, Math.max(...lines.map(line => line.length * avgCharWidth)));
-            const height = lines.length * lineHeight;
-            
-            return { width, height, lines };
+            return lines;
         }
 
-        // Add data for text dimensions to nodes
-        data.nodes.forEach(d => {
-            let fontSize, maxWidth;
-            if (d.type === "engine") {
-                fontSize = 14;
-                maxWidth = 120;
-            } else if (d.type === "quadrant") {
-                fontSize = 12;
-                maxWidth = 160;
-            } else {
-                fontSize = 9;
-                maxWidth = 300;
-            }
+        // Draw quadrant dividers
+        function drawQuadrants() {
+            // Vertical line
+            const vLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            vLine.setAttribute('x1', width/2);
+            vLine.setAttribute('y1', 50);
+            vLine.setAttribute('x2', width/2);
+            vLine.setAttribute('y2', height-50);
+            vLine.setAttribute('class', 'axis-line');
+            svg.appendChild(vLine);
             
-            const dimensions = estimateTextDimensions(d.label, fontSize, maxWidth);
-            d.textWidth = dimensions.width + 20; // 10px padding each side
-            d.textHeight = dimensions.height + 20; // 10px padding top/bottom
-        });
-
-        // Add rectangles for nodes with dynamic sizing
-        node.append("rect")
-            .attr("width", d => d.textWidth)
-            .attr("height", d => d.textHeight)
-            .attr("x", d => -d.textWidth/2)
-            .attr("y", d => -d.textHeight/2)
-            .attr("rx", 8)
-            .attr("ry", 8)
-            .attr("class", d => `node-${d.type}`);
-
-        // Add text labels with better positioning for rectangles
-        node.append("foreignObject")
-            .attr("width", d => d.textWidth - 10)
-            .attr("height", d => d.textHeight - 10)
-            .attr("x", d => -(d.textWidth-10)/2)
-            .attr("y", d => -(d.textHeight-10)/2)
-            .append("xhtml:div")
-            .style("width", "100%")
-            .style("height", "100%")
-            .style("display", "flex")
-            .style("align-items", "center")
-            .style("justify-content", "center")
-            .style("text-align", "center")
-            .style("font-size", d => d.type === "engine" ? "14px" : d.type === "quadrant" ? "12px" : "9px")
-            .style("font-weight", d => d.type === "engine" || d.type === "quadrant" ? "bold" : "normal")
-            .style("line-height", "1.2")
-            .style("overflow", "hidden")
-            .style("padding", "5px")
-            .style("box-sizing", "border-box")
-            .html(d => d.label.replace(/\n/g, '<br>'));
-
-        // Update positions on simulation tick
-        simulation.on("tick", () => {
-            // Keep nodes within bounds
-            data.nodes.forEach(d => {
-                d.x = Math.max(50, Math.min(width - 50, d.x));
-                d.y = Math.max(50, Math.min(height - 50, d.y));
+            // Horizontal line
+            const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            hLine.setAttribute('x1', 50);
+            hLine.setAttribute('y1', height/2);
+            hLine.setAttribute('x2', width-50);
+            hLine.setAttribute('y2', height/2);
+            hLine.setAttribute('class', 'axis-line');
+            svg.appendChild(hLine);
+            
+            // Quadrant labels
+            const labels = [
+                { text: "TEMPORAL REGIMES", x: width/4, y: 30 },
+                { text: "EPISTEMIC MUTATIONS", x: 3*width/4, y: 30 },
+                { text: "RECURSIVITY PROBLEM", x: width/4, y: height-20 },
+                { text: "ANTI-CAPTURE STRATEGIES", x: 3*width/4, y: height-20 }
+            ];
+            
+            labels.forEach(label => {
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', label.x);
+                text.setAttribute('y', label.y);
+                text.setAttribute('class', 'quadrant-label');
+                text.textContent = label.text;
+                svg.appendChild(text);
             });
-            
-            link.attr("d", d => {
-                const dx = d.target.x - d.source.x;
-                const dy = d.target.y - d.source.y;
+        }
+
+        // Draw links
+        function drawLinks() {
+            links.forEach(link => {
+                const sourceNode = nodeMap[link.source];
+                const targetNode = nodeMap[link.target];
+                
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                const dx = targetNode.x - sourceNode.x;
+                const dy = targetNode.y - sourceNode.y;
                 const dr = Math.sqrt(dx * dx + dy * dy) * 1.2;
-                return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
+                const pathData = `M${sourceNode.x},${sourceNode.y}A${dr},${dr} 0 0,1 ${targetNode.x},${targetNode.y}`;
+                
+                path.setAttribute('d', pathData);
+                path.setAttribute('class', `link link-${link.type}`);
+                svg.appendChild(path);
             });
-
-            node.attr("transform", d => `translate(${d.x},${d.y})`);
-        });
-
-        // Drag functions
-        function dragstarted(event, d) {
-            event.sourceEvent.stopPropagation();
-            if (!event.active) simulation.alphaTarget(0.3).restart();
-            d.fx = d.x;
-            d.fy = d.y;
         }
 
-        function dragged(event, d) {
-            event.sourceEvent.stopPropagation();
-            d.fx = event.x;
-            d.fy = event.y;
+        // Draw nodes
+        function drawNodes() {
+            nodes.forEach(node => {
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.setAttribute('class', 'node');
+                group.setAttribute('transform', `translate(${node.x}, ${node.y})`);
+                group.setAttribute('data-node-id', node.id);
+                
+                // Store reference for easy access
+                window.nodeGroups.set(node.id, group);
+                
+                // Rectangle
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', -node.width/2);
+                rect.setAttribute('y', -node.height/2);
+                rect.setAttribute('width', node.width);
+                rect.setAttribute('height', node.height);
+                rect.setAttribute('class', `node-rect node-${node.type}`);
+                group.appendChild(rect);
+                
+                // Text
+                node.lines.forEach((line, i) => {
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('y', (i - (node.lines.length-1)/2) * (node.type === "engine" ? 16 : 11));
+                    text.setAttribute('class', `node-text ${node.type === "engine" ? "node-text-engine" : ""}`);
+                    text.textContent = line;
+                    group.appendChild(text);
+                });
+                
+                // Add drag behavior
+                let isDragging = false;
+                let startX, startY, offsetX, offsetY;
+                
+                function onMouseDown(e) {
+                    isDragging = true;
+                    const rect = svg.getBoundingClientRect();
+                    startX = e.clientX - rect.left;
+                    startY = e.clientY - rect.top;
+                    offsetX = startX - node.x;
+                    offsetY = startY - node.y;
+                    group.classList.add('dragging');
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                
+                function onMouseMove(e) {
+                    if (!isDragging) return;
+                    const rect = svg.getBoundingClientRect();
+                    const newX = e.clientX - rect.left - offsetX;
+                    const newY = e.clientY - rect.top - offsetY;
+                    
+                    // Constrain to boundaries
+                    node.x = Math.max(node.width/2 + 50, Math.min(width - node.width/2 - 50, newX));
+                    node.y = Math.max(node.height/2 + 50, Math.min(height - node.height/2 - 50, newY));
+                    
+                    group.setAttribute('transform', `translate(${node.x}, ${node.y})`);
+                    updateLinks();
+                    e.preventDefault();
+                }
+                
+                function onMouseUp(e) {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    group.classList.remove('dragging');
+                    e.preventDefault();
+                }
+                
+                // Add event listeners to the group
+                group.addEventListener('mousedown', onMouseDown);
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+                
+                // Prevent text selection
+                group.addEventListener('selectstart', e => e.preventDefault());
+                
+                svg.appendChild(group);
+            });
         }
 
-        function dragended(event, d) {
-            event.sourceEvent.stopPropagation();
-            if (!event.active) simulation.alphaTarget(0);
-            // Visual feedback
-            d3.select(event.sourceEvent.target.parentNode).select("rect")
-                .style("stroke", "#14aa8c").transition().duration(500).style("stroke", null);
+        function updateLinks() {
+            const linkElements = svg.querySelectorAll('.link');
+            linkElements.forEach((linkElement, i) => {
+                const linkData = window.linksData[i];
+                const sourceNode = nodeMap[linkData.source];
+                const targetNode = nodeMap[linkData.target];
+                const dx = targetNode.x - sourceNode.x;
+                const dy = targetNode.y - sourceNode.y;
+                const dr = Math.sqrt(dx * dx + dy * dy) * 1.2;
+                const pathData = `M${sourceNode.x},${sourceNode.y}A${dr},${dr} 0 0,1 ${targetNode.x},${targetNode.y}`;
+                linkElement.setAttribute('d', pathData);
+            });
         }
 
-        // Global function to reset all nodes
+        // Initialize diagram
+        drawQuadrants();
+        drawLinks();
+        drawNodes();
+
+        // Global functions
         window.resetAllNodes = function() {
-            data.nodes.forEach(d => {
-                d.fx = null;
-                d.fy = null;
+            nodes.forEach(node => {
+                if (node.quadrant === "temporal") {
+                    node.x = width/4 + (Math.random() - 0.5) * 200;
+                    node.y = height/4 + (Math.random() - 0.5) * 200;
+                } else if (node.quadrant === "epistemic") {
+                    node.x = 3*width/4 + (Math.random() - 0.5) * 200;
+                    node.y = height/4 + (Math.random() - 0.5) * 200;
+                } else if (node.quadrant === "recursive") {
+                    node.x = width/4 + (Math.random() - 0.5) * 200;
+                    node.y = 3*height/4 + (Math.random() - 0.5) * 200;
+                } else if (node.quadrant === "anticapture") {
+                    node.x = 3*width/4 + (Math.random() - 0.5) * 200;
+                    node.y = 3*height/4 + (Math.random() - 0.5) * 200;
+                } else {
+                    node.x = width/2;
+                    node.y = height/2;
+                }
+                
+                node.x = Math.max(node.width/2 + 50, Math.min(width - node.width/2 - 50, node.x));
+                node.y = Math.max(node.height/2 + 50, Math.min(height - node.height/2 - 50, node.y));
             });
-            simulation.alphaTarget(0.3).restart();
             
-            // Visual feedback
-            node.selectAll("rect").style("stroke", "#ff6b6b")
-                .transition().duration(1000).style("stroke", null);
+            // Redraw everything
+            svg.innerHTML = '';
+            window.nodeGroups.clear();
+            drawQuadrants();
+            drawLinks();
+            drawNodes();
         };
 
-        // Global function to export text content based on current node positions
         window.exportText = function() {
-            // Get current node positions and filter out quadrant labels and engine
-            const contentNodes = data.nodes.filter(d => d.type !== 'quadrant' && d.type !== 'engine');
-            
-            // Determine which quadrant each node is currently in based on position
-            const categorizeByPosition = (node) => {
-                const isLeft = node.x < width/2;
-                const isTop = node.y < height/2;
+            try {
+                const contentNodes = nodes.filter(d => d.type !== 'engine');
                 
-                if (isTop && !isLeft) return 'epistemic';
-                if (!isTop && !isLeft) return 'anticapture';
-                if (!isTop && isLeft) return 'recursive';
-                if (isTop && isLeft) return 'temporal';
-                return 'center';
-            };
+                const categorizeByPosition = (node) => {
+                    const isLeft = node.x < width/2;
+                    const isTop = node.y < height/2;
+                    
+                    if (isTop && !isLeft) return 'epistemic';
+                    if (!isTop && !isLeft) return 'anticapture';
+                    if (!isTop && isLeft) return 'recursive';
+                    if (isTop && isLeft) return 'temporal';
+                    return 'center';
+                };
 
-            // Group nodes by their current quadrant positions
-            const quadrantGroups = {
-                'epistemic': [],
-                'anticapture': [],
-                'recursive': [],
-                'temporal': []
-            };
+                const quadrantGroups = {
+                    'epistemic': [],
+                    'anticapture': [],
+                    'recursive': [],
+                    'temporal': []
+                };
 
-            contentNodes.forEach(node => {
-                const currentQuadrant = categorizeByPosition(node);
-                if (quadrantGroups[currentQuadrant]) {
-                    quadrantGroups[currentQuadrant].push(node);
-                }
-            });
-
-            // Sort nodes within each quadrant by position (top-to-bottom, then left-to-right)
-            Object.keys(quadrantGroups).forEach(quadrant => {
-                quadrantGroups[quadrant].sort((a, b) => {
-                    if (Math.abs(a.y - b.y) < 50) { // If roughly same row
-                        return a.x - b.x; // Sort left to right
+                contentNodes.forEach(node => {
+                    const currentQuadrant = categorizeByPosition(node);
+                    if (quadrantGroups[currentQuadrant]) {
+                        quadrantGroups[currentQuadrant].push(node);
                     }
-                    return a.y - b.y; // Sort top to bottom
                 });
-            });
 
-            const quadrantNames = {
-                'epistemic': 'EPISTEMIC MUTATIONS',
-                'anticapture': 'ANTI-CAPTURE STRATEGIES', 
-                'recursive': 'RECURSIVITY PROBLEM',
-                'temporal': 'TEMPORAL REGIMES'
-            };
+                Object.keys(quadrantGroups).forEach(quadrant => {
+                    quadrantGroups[quadrant].sort((a, b) => {
+                        if (Math.abs(a.y - b.y) < 50) {
+                            return a.x - b.x;
+                        }
+                        return a.y - b.y;
+                    });
+                });
 
-            // Build text content based on current arrangement
-            let textContent = "RECURSIVE TEMPORALITIES: EPISTEMIC MUTATIONS & ANTI-CAPTURE STRATEGIES\n";
-            textContent += "=" + "=".repeat(70) + "\n\n";
-            textContent += "Framework: This document reflects the current spatial arrangement of concepts as positioned in the interactive diagram. The order below follows the real-time layout, creating a unique narrative flow based on how the nodes have been arranged.\n\n";
+                const quadrantNames = {
+                    'epistemic': 'EPISTEMIC MUTATIONS',
+                    'anticapture': 'ANTI-CAPTURE STRATEGIES', 
+                    'recursive': 'RECURSIVITY PROBLEM',
+                    'temporal': 'TEMPORAL REGIMES'
+                };
 
-            // Process quadrants in clockwise order from top-right
-            const quadrantOrder = ['epistemic', 'anticapture', 'recursive', 'temporal'];
-            
-            quadrantOrder.forEach(quadrant => {
-                const nodes = quadrantGroups[quadrant];
+                let textContent = "RECURSIVE TEMPORALITIES: EPISTEMIC MUTATIONS & ANTI-CAPTURE STRATEGIES\n";
+                textContent += "=" + "=".repeat(70) + "\n\n";
+                textContent += "Framework: This document reflects the current spatial arrangement of concepts as positioned in the interactive diagram.\n\n";
+
+                const quadrantOrder = ['temporal', 'epistemic', 'recursive', 'anticapture'];
                 
-                if (nodes.length > 0) {
+                quadrantOrder.forEach(quadrant => {
+                    const nodes = quadrantGroups[quadrant];
+                    
                     textContent += quadrantNames[quadrant] + "\n";
                     textContent += "-".repeat(quadrantNames[quadrant].length) + "\n";
-                    textContent += `(${nodes.length} concepts arranged in this quadrant)\n\n`;
                     
-                    nodes.forEach((node, index) => {
-                        // Clean up the text
-                        const cleanText = node.label
-                            .replace(/\n/g, ' ')
-                            .replace(/\s+/g, ' ')
-                            .trim();
+                    if (nodes.length > 0) {
+                        textContent += `(${nodes.length} concepts arranged in this quadrant)\n\n`;
                         
-                        textContent += `${index + 1}. ${cleanText}\n\n`;
-                    });
+                        nodes.forEach((node, index) => {
+                            const cleanText = node.label.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+                            textContent += `${index + 1}. ${cleanText}\n\n`;
+                        });
+                    } else {
+                        textContent += "(No concepts currently positioned in this quadrant)\n\n";
+                    }
                     
                     textContent += "\n";
-                } else {
-                    textContent += quadrantNames[quadrant] + "\n";
-                    textContent += "-".repeat(quadrantNames[quadrant].length) + "\n";
-                    textContent += "(No concepts currently positioned in this quadrant)\n\n\n";
+                });
+
+                const currentDate = new Date().toLocaleDateString();
+                const currentTime = new Date().toLocaleTimeString();
+                textContent += "\n" + "-".repeat(70) + "\n";
+                textContent += `Exported from Recursive Temporalities Diagram on ${currentDate} at ${currentTime}\n`;
+
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                const blob = new Blob([textContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `recursive_temporalities_arrangement_${timestamp}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // Visual feedback
+                const button = event.target;
+                if (button) {
+                    const originalText = button.textContent;
+                    button.textContent = 'Exported!';
+                    button.style.background = '#14aa8c';
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.background = '#0064b4';
+                    }, 2000);
                 }
-            });
-
-            // Add metadata about the current arrangement
-            const currentDate = new Date().toLocaleDateString();
-            const currentTime = new Date().toLocaleTimeString();
-            textContent += "\n" + "-".repeat(70) + "\n";
-            textContent += `Exported from Recursive Temporalities Diagram on ${currentDate} at ${currentTime}\n`;
-            textContent += "This text reflects the spatial arrangement of concepts at the time of export.\n";
-            textContent += "Rearranging nodes and re-exporting will create a different narrative flow.\n";
-
-            // Create and download file with timestamp
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-            const blob = new Blob([textContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `recursive_temporalities_arrangement_${timestamp}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            // Visual feedback
-            const button = event.target;
-            const originalText = button.textContent;
-            button.textContent = 'Exported!';
-            button.style.background = '#14aa8c';
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.background = '#0064b4';
-            }, 2000);
-        };
-
-        // Add hover effects and double-click to unlock
-        node.on("mouseover", function(event, d) {
-            d3.select(this).select("rect").style("stroke-width", "3px");
-        })
-        .on("mouseout", function(event, d) {
-            d3.select(this).select("rect").style("stroke-width", null);
-        })
-        .on("dblclick", function(event, d) {
-            event.stopPropagation();
-            d.fx = null;
-            d.fy = null;
-            simulation.alphaTarget(0.3).restart();
-            
-            const rect = d3.select(this).select("rect");
-            rect.style("stroke", "#ff6b6b").transition().duration(500).style("stroke", null);
-        });
-
-        // Additional protection against zoom
-        document.addEventListener('wheel', function(e) {
-            if (e.target.closest('#network')) {
-                e.preventDefault();
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Export failed. Check console for details.');
             }
-        }, { passive: false });
+        };
     </script>
 </body>
 </html>
